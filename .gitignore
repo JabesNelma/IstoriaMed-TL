@@ -1,0 +1,48 @@
+# =========================================================================
+# NestJS Backend (Node.js)
+# =========================================================================
+src/backend/node_modules/
+src/backend/dist/
+src/backend/.env
+src/backend/npm-debug.log*
+src/backend/yarn-debug.log*
+src/backend/yarn-error.log*
+
+# =========================================================================
+# Flutter Frontend (Dart/Flutter)
+# =========================================================================
+src/frontend/.backend/
+src/frontend/.dart_tool/
+src/frontend/.flutter-plugins
+src/frontend/.flutter-plugins-dependencies
+src/frontend/.packages
+src/frontend/.pub-cache/
+src/frontend/.pub/
+src/frontend/build/
+src/frontend/.env
+
+# Android specific
+src/frontend/android/.gradle/
+src/frontend/android/local.properties
+src/frontend/android/generatedPluginRegistrant.gradle
+
+# iOS specific
+src/frontend/ios/.generated/
+src/frontend/ios/Flutter/Flutter.podspec
+src/frontend/ios/Flutter/Generated.xcconfig
+src/frontend/ios/Flutter/flutter_export_environment.sh
+src/frontend/ios/Pods/
+
+# =========================================================================
+# Operating System & IDE Files
+# =========================================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.log
+.vscode/
+.idea/
