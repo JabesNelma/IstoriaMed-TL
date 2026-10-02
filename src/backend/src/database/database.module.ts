@@ -8,13 +8,14 @@ import { UserRecord } from './entities/user.record';
 import { FacilityRecord } from './entities/facility.record';
 import { FacilityMembershipRecord } from './entities/facility-membership.record';
 import { StaffRecord } from './entities/staff.record';
+import { SyncOperationRecord } from './entities/sync-operation.record';
 
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
       useFactory: getDatabaseOptions,
     }),
-    TypeOrmModule.forFeature([PatientRecord, ClinicalVisitRecord, UserRecord, FacilityRecord, FacilityMembershipRecord, StaffRecord]),
+    TypeOrmModule.forFeature([PatientRecord, ClinicalVisitRecord, UserRecord, FacilityRecord, FacilityMembershipRecord, StaffRecord, SyncOperationRecord]),
   ],
   exports: [TypeOrmModule],
 })

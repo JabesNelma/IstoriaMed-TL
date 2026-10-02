@@ -1,5 +1,6 @@
 import 'package:isar/isar.dart';
 
+import '../core/sync/sync_queue.dart';
 import '../data/local/istoria_schema.dart';
 import '../data/remote/api_client.dart';
 import '../data/remote/api_exception.dart';
@@ -10,12 +11,10 @@ class IstoriaRepository {
   final Isar isar;
   final ApiClient apiClient;
 
-  Future<IstoriaKlinis> create(IstoriaKlinis istoria) async {
-    istoria.syncStatus = 'Pending';
-    await isar.writeTxn(() => isar.istoriaKlinis.put(istoria));
-    await _trySync(istoria);
-    return istoria;
-  }
+  /// Offline-first create: the clinical visit and its queue entry are written
+  /// in one Isar transaction, and the same queue synchronizes it later.
+  Future<IstoriaKlinis> create(IstoriaKlinis istoria) =>
+      SyncQueue.enqueueClinicalVisit(isar, istoria);
 
   Future<List<IstoriaKlinis>> history(String pasienId) async {
     try {
@@ -30,42 +29,13 @@ class IstoriaRepository {
       if (!error.isNetworkFailure) rethrow;
     }
 
-    return (await isar.istoriaKlinis.where().findAll())
+    final local = (await isar.istoriaKlinis.where().findAll())
         .where((record) => record.pasienId == pasienId)
         .toList()
       ..sort(
         (a, b) => (b.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0))
-            .compareTo(
-              a.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0),
-            ),
+            .compareTo(a.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0)),
       );
-  }
-
-  Future<void> syncPending() async {
-    final pending = (await isar.istoriaKlinis.where().findAll())
-        .where((record) => record.syncStatus == 'Pending')
-        .toList();
-    for (final record in pending) {
-      await _trySync(record);
-    }
-  }
-
-  Future<void> _trySync(IstoriaKlinis istoria) async {
-    try {
-      final response = await apiClient.createIstoria(istoria);
-      istoria.remoteId = response['kunjungan_id'] as String?;
-      istoria.tanggalKunjungan = response['tanggal_kunjungan'] == null
-          ? istoria.tanggalKunjungan
-          : DateTime.parse(response['tanggal_kunjungan'] as String);
-      istoria.syncStatus = 'Synced';
-    } on ApiException catch (error) {
-      if (!error.isNetworkFailure) {
-        istoria.syncStatus = 'Failed';
-        await isar.writeTxn(() => isar.istoriaKlinis.put(istoria));
-        rethrow;
-      }
-      istoria.syncStatus = 'Pending';
-    }
-    await isar.writeTxn(() => isar.istoriaKlinis.put(istoria));
+    return local;
   }
 }

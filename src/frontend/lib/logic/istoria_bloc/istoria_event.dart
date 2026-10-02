@@ -26,3 +26,7 @@ final class FetchPasienHistory extends IstoriaEvent {
   @override
   List<Object?> get props => [pasienId];
 }
+
+final class SyncPendingIstoria extends IstoriaEvent {
+  const SyncPendingIstoria();
+}

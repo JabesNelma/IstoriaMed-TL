@@ -6,6 +6,7 @@ import { UserRecord } from './entities/user.record';
 import { FacilityRecord } from './entities/facility.record';
 import { FacilityMembershipRecord } from './entities/facility-membership.record';
 import { StaffRecord } from './entities/staff.record';
+import { SyncOperationRecord } from './entities/sync-operation.record';
 
 export function getDatabaseOptions(): DataSourceOptions {
   const url = process.env.DATABASE_URL;
@@ -16,7 +17,7 @@ export function getDatabaseOptions(): DataSourceOptions {
   return {
     type: 'postgres',
     url,
-    entities: [PatientRecord, ClinicalVisitRecord, UserRecord, FacilityRecord, FacilityMembershipRecord, StaffRecord],
+    entities: [PatientRecord, ClinicalVisitRecord, UserRecord, FacilityRecord, FacilityMembershipRecord, StaffRecord, SyncOperationRecord],
     migrations: ['dist/database/migrations/*.js'],
     synchronize: false,
     migrationsRun: false,

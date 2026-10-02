@@ -19,18 +19,18 @@ Future<void> main() async {
   final apiClient = ApiClient();
   final pasienRepository = PasienRepository(isar: isar, apiClient: apiClient);
   final istoriaRepository = IstoriaRepository(isar: isar, apiClient: apiClient);
-  final syncService = SyncService(
-    pasienRepository: pasienRepository,
-    istoriaRepository: istoriaRepository,
-  );
+  final syncService = SyncService(isar: isar, apiClient: apiClient);
 
-  Timer.periodic(const Duration(minutes: 1), (_) => syncService.synchronize());
+  // Startup drain of the persistent queue: whatever survived the last process
+  // is retried, and an interrupted SYNCING operation is recovered.
+  unawaited(syncService.syncPending());
 
   runApp(
     MultiRepositoryProvider(
       providers: [
         RepositoryProvider.value(value: pasienRepository),
         RepositoryProvider.value(value: istoriaRepository),
+        RepositoryProvider.value(value: syncService),
       ],
       child: const IstoriaMedApp(),
     ),
@@ -45,10 +45,16 @@ class IstoriaMedApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => PasienBloc(context.read<PasienRepository>()),
+          create: (context) => PasienBloc(
+            context.read<PasienRepository>(),
+            context.read<SyncService>(),
+          ),
         ),
         BlocProvider(
-          create: (context) => IstoriaBloc(context.read<IstoriaRepository>()),
+          create: (context) => IstoriaBloc(
+            context.read<IstoriaRepository>(),
+            context.read<SyncService>(),
+          ),
         ),
       ],
       child: MaterialApp(

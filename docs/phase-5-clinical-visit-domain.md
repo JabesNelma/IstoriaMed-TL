@@ -36,8 +36,8 @@ Migration `AddFacilityToClinicalVisits1710000003000` adds `clinical_visits.facil
 
 ## Deferred
 
-- Full offline synchronization engine
-- Conflict-resolution queue
+- Full offline synchronization engine (implemented in `phase-6-offline-sync.md`)
+- Conflict-resolution queue (implemented in `phase-6-offline-sync.md`)
 - Patient portal and scheduling
 - Prescription and pharmacy workflow
 - Laboratory and radiology

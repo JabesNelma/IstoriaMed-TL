@@ -146,12 +146,21 @@ class _IstoriaKlinisScreenState extends State<IstoriaKlinisScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text('Istoria Pasiente', style: Theme.of(context).textTheme.titleLarge),
-                IconButton(
-                  tooltip: 'Lee istoria',
-                  onPressed: _patientId.text.trim().isEmpty
-                      ? null
-                      : () => context.read<IstoriaBloc>().add(FetchPasienHistory(_patientId.text.trim())),
-                  icon: const Icon(Icons.refresh),
+                Row(
+                  children: [
+                    IconButton(
+                      tooltip: 'Sinkroniza kua',
+                      onPressed: () => context.read<IstoriaBloc>().add(const SyncPendingIstoria()),
+                      icon: const Icon(Icons.sync),
+                    ),
+                    IconButton(
+                      tooltip: 'Lee istoria',
+                      onPressed: _patientId.text.trim().isEmpty
+                          ? null
+                          : () => context.read<IstoriaBloc>().add(FetchPasienHistory(_patientId.text.trim())),
+                      icon: const Icon(Icons.refresh),
+                    ),
+                  ],
                 ),
               ],
             ),

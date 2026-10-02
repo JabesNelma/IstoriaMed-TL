@@ -47,7 +47,11 @@ const PasienSchema = CollectionSchema(
       name: r'namaLengkap',
       type: IsarType.string,
     ),
-    r'noKtp': PropertySchema(id: 6, name: r'noKtp', type: IsarType.string),
+    r'noKtp': PropertySchema(
+      id: 6,
+      name: r'noKtp',
+      type: IsarType.string,
+    ),
     r'remoteId': PropertySchema(
       id: 7,
       name: r'remoteId',
@@ -62,7 +66,7 @@ const PasienSchema = CollectionSchema(
       id: 9,
       name: r'tempatLahir',
       type: IsarType.string,
-    ),
+    )
   },
   estimateSize: _pasienEstimateSize,
   serialize: _pasienSerialize,
@@ -215,7 +219,10 @@ extension PasienQueryWhereSort on QueryBuilder<Pasien, Pasien, QWhere> {
 extension PasienQueryWhere on QueryBuilder<Pasien, Pasien, QWhereClause> {
   QueryBuilder<Pasien, Pasien, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(IdWhereClause.between(lower: id, upper: id));
+      return query.addWhereClause(IdWhereClause.between(
+        lower: id,
+        upper: id,
+      ));
     });
   }
 
@@ -241,10 +248,8 @@ extension PasienQueryWhere on QueryBuilder<Pasien, Pasien, QWhereClause> {
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QAfterWhereClause> idGreaterThan(
-    Id id, {
-    bool include = false,
-  }) {
+  QueryBuilder<Pasien, Pasien, QAfterWhereClause> idGreaterThan(Id id,
+      {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.greaterThan(lower: id, includeLower: include),
@@ -252,10 +257,8 @@ extension PasienQueryWhere on QueryBuilder<Pasien, Pasien, QWhereClause> {
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QAfterWhereClause> idLessThan(
-    Id id, {
-    bool include = false,
-  }) {
+  QueryBuilder<Pasien, Pasien, QAfterWhereClause> idLessThan(Id id,
+      {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
         IdWhereClause.lessThan(upper: id, includeUpper: include),
@@ -270,14 +273,12 @@ extension PasienQueryWhere on QueryBuilder<Pasien, Pasien, QWhereClause> {
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addWhereClause(
-        IdWhereClause.between(
-          lower: lowerId,
-          includeLower: includeLower,
-          upper: upperId,
-          includeUpper: includeUpper,
-        ),
-      );
+      return query.addWhereClause(IdWhereClause.between(
+        lower: lowerId,
+        includeLower: includeLower,
+        upper: upperId,
+        includeUpper: includeUpper,
+      ));
     });
   }
 }
@@ -285,17 +286,17 @@ extension PasienQueryWhere on QueryBuilder<Pasien, Pasien, QWhereClause> {
 extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> facilityIdIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'facilityId'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'facilityId',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> facilityIdIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'facilityId'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'facilityId',
+      ));
     });
   }
 
@@ -304,13 +305,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'facilityId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'facilityId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -320,14 +319,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'facilityId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'facilityId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -337,14 +334,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'facilityId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'facilityId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -356,16 +351,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'facilityId',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'facilityId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -374,13 +367,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'facilityId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'facilityId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -389,76 +380,70 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'facilityId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'facilityId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> facilityIdContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'facilityId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'facilityId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> facilityIdMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'facilityId',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'facilityId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> facilityIdIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'facilityId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'facilityId',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> facilityIdIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'facilityId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'facilityId',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> fingerprintHashIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'fingerprintHash'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'fingerprintHash',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  fingerprintHashIsNotNull() {
+      fingerprintHashIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'fingerprintHash'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'fingerprintHash',
+      ));
     });
   }
 
@@ -467,31 +452,27 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'fingerprintHash',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fingerprintHash',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  fingerprintHashGreaterThan(
+      fingerprintHashGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'fingerprintHash',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'fingerprintHash',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -501,14 +482,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'fingerprintHash',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'fingerprintHash',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -520,16 +499,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'fingerprintHash',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'fingerprintHash',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -538,13 +515,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'fingerprintHash',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'fingerprintHash',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -553,68 +528,63 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'fingerprintHash',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'fingerprintHash',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> fingerprintHashContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'fingerprintHash',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'fingerprintHash',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> fingerprintHashMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'fingerprintHash',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'fingerprintHash',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> fingerprintHashIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'fingerprintHash', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fingerprintHash',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  fingerprintHashIsNotEmpty() {
+      fingerprintHashIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'fingerprintHash', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'fingerprintHash',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'id', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'id',
+        value: value,
+      ));
     });
   }
 
@@ -623,13 +593,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'id',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
     });
   }
 
@@ -638,13 +606,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'id',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'id',
+        value: value,
+      ));
     });
   }
 
@@ -655,15 +621,13 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'id',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'id',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
     });
   }
 
@@ -672,13 +636,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'jenisKelamin',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'jenisKelamin',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -688,14 +650,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'jenisKelamin',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'jenisKelamin',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -705,14 +665,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'jenisKelamin',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'jenisKelamin',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -724,16 +682,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'jenisKelamin',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'jenisKelamin',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -742,13 +698,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'jenisKelamin',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'jenisKelamin',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -757,59 +711,53 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'jenisKelamin',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'jenisKelamin',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> jenisKelaminContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'jenisKelamin',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'jenisKelamin',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> jenisKelaminMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'jenisKelamin',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'jenisKelamin',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> jenisKelaminIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'jenisKelamin', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'jenisKelamin',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> jenisKelaminIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'jenisKelamin', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'jenisKelamin',
+        value: '',
+      ));
     });
   }
 
@@ -818,13 +766,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'localStatus',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'localStatus',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -834,14 +780,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'localStatus',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'localStatus',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -851,14 +795,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'localStatus',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'localStatus',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -870,16 +812,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'localStatus',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'localStatus',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -888,13 +828,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'localStatus',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'localStatus',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -903,131 +841,122 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'localStatus',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'localStatus',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> localStatusContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'localStatus',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'localStatus',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> localStatusMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'localStatus',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'localStatus',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> localStatusIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'localStatus', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'localStatus',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> localStatusIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'localStatus', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'localStatus',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberIsNull() {
+      medicalRecordNumberIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'medicalRecordNumber'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'medicalRecordNumber',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberIsNotNull() {
+      medicalRecordNumberIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'medicalRecordNumber'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'medicalRecordNumber',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberEqualTo(String? value, {bool caseSensitive = true}) {
+      medicalRecordNumberEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'medicalRecordNumber',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'medicalRecordNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberGreaterThan(
+      medicalRecordNumberGreaterThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'medicalRecordNumber',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'medicalRecordNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberLessThan(
+      medicalRecordNumberLessThan(
     String? value, {
     bool include = false,
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'medicalRecordNumber',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'medicalRecordNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberBetween(
+      medicalRecordNumberBetween(
     String? lower,
     String? upper, {
     bool includeLower = true,
@@ -1035,89 +964,84 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'medicalRecordNumber',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'medicalRecordNumber',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberStartsWith(String value, {bool caseSensitive = true}) {
+      medicalRecordNumberStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'medicalRecordNumber',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'medicalRecordNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberEndsWith(String value, {bool caseSensitive = true}) {
+      medicalRecordNumberEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'medicalRecordNumber',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'medicalRecordNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberContains(String value, {bool caseSensitive = true}) {
+      medicalRecordNumberContains(String value, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'medicalRecordNumber',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'medicalRecordNumber',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberMatches(String pattern, {bool caseSensitive = true}) {
+      medicalRecordNumberMatches(String pattern, {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'medicalRecordNumber',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'medicalRecordNumber',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberIsEmpty() {
+      medicalRecordNumberIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'medicalRecordNumber', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'medicalRecordNumber',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition>
-  medicalRecordNumberIsNotEmpty() {
+      medicalRecordNumberIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          property: r'medicalRecordNumber',
-          value: '',
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'medicalRecordNumber',
+        value: '',
+      ));
     });
   }
 
@@ -1126,13 +1050,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'namaLengkap',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'namaLengkap',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1142,14 +1064,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'namaLengkap',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'namaLengkap',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1159,14 +1079,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'namaLengkap',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'namaLengkap',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1178,16 +1096,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'namaLengkap',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'namaLengkap',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1196,13 +1112,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'namaLengkap',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'namaLengkap',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1211,75 +1125,69 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'namaLengkap',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'namaLengkap',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> namaLengkapContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'namaLengkap',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'namaLengkap',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> namaLengkapMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'namaLengkap',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'namaLengkap',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> namaLengkapIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'namaLengkap', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'namaLengkap',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> namaLengkapIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'namaLengkap', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'namaLengkap',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> noKtpIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'noKtp'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'noKtp',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> noKtpIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'noKtp'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'noKtp',
+      ));
     });
   }
 
@@ -1288,13 +1196,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'noKtp',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'noKtp',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1304,14 +1210,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'noKtp',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'noKtp',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1321,14 +1225,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'noKtp',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'noKtp',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1340,16 +1242,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'noKtp',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'noKtp',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1358,13 +1258,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'noKtp',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'noKtp',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1373,75 +1271,69 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'noKtp',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'noKtp',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> noKtpContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'noKtp',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'noKtp',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> noKtpMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'noKtp',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'noKtp',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> noKtpIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'noKtp', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'noKtp',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> noKtpIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'noKtp', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'noKtp',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> remoteIdIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNull(property: r'remoteId'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'remoteId',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> remoteIdIsNotNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        const FilterCondition.isNotNull(property: r'remoteId'),
-      );
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'remoteId',
+      ));
     });
   }
 
@@ -1450,13 +1342,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'remoteId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'remoteId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1466,14 +1356,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'remoteId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'remoteId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1483,14 +1371,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'remoteId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'remoteId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1502,16 +1388,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'remoteId',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'remoteId',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1520,13 +1404,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'remoteId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'remoteId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1535,69 +1417,63 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'remoteId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'remoteId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> remoteIdContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'remoteId',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'remoteId',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> remoteIdMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'remoteId',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'remoteId',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> remoteIdIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'remoteId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'remoteId',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> remoteIdIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'remoteId', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'remoteId',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> tanggalLahirEqualTo(
-    DateTime value,
-  ) {
+      DateTime value) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'tanggalLahir', value: value),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'tanggalLahir',
+        value: value,
+      ));
     });
   }
 
@@ -1606,13 +1482,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'tanggalLahir',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'tanggalLahir',
+        value: value,
+      ));
     });
   }
 
@@ -1621,13 +1495,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'tanggalLahir',
-          value: value,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'tanggalLahir',
+        value: value,
+      ));
     });
   }
 
@@ -1638,15 +1510,13 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool includeUpper = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'tanggalLahir',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'tanggalLahir',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
     });
   }
 
@@ -1655,13 +1525,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(
-          property: r'tempatLahir',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'tempatLahir',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1671,14 +1539,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(
-          include: include,
-          property: r'tempatLahir',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'tempatLahir',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1688,14 +1554,12 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.lessThan(
-          include: include,
-          property: r'tempatLahir',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'tempatLahir',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1707,16 +1571,14 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.between(
-          property: r'tempatLahir',
-          lower: lower,
-          includeLower: includeLower,
-          upper: upper,
-          includeUpper: includeUpper,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'tempatLahir',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1725,13 +1587,11 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.startsWith(
-          property: r'tempatLahir',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'tempatLahir',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
@@ -1740,59 +1600,53 @@ extension PasienQueryFilter on QueryBuilder<Pasien, Pasien, QFilterCondition> {
     bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.endsWith(
-          property: r'tempatLahir',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'tempatLahir',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> tempatLahirContains(
-    String value, {
-    bool caseSensitive = true,
-  }) {
+      String value,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.contains(
-          property: r'tempatLahir',
-          value: value,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'tempatLahir',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> tempatLahirMatches(
-    String pattern, {
-    bool caseSensitive = true,
-  }) {
+      String pattern,
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.matches(
-          property: r'tempatLahir',
-          wildcard: pattern,
-          caseSensitive: caseSensitive,
-        ),
-      );
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'tempatLahir',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> tempatLahirIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.equalTo(property: r'tempatLahir', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'tempatLahir',
+        value: '',
+      ));
     });
   }
 
   QueryBuilder<Pasien, Pasien, QAfterFilterCondition> tempatLahirIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(
-        FilterCondition.greaterThan(property: r'tempatLahir', value: ''),
-      );
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'tempatLahir',
+        value: '',
+      ));
     });
   }
 }
@@ -2058,71 +1912,59 @@ extension PasienQuerySortThenBy on QueryBuilder<Pasien, Pasien, QSortThenBy> {
 }
 
 extension PasienQueryWhereDistinct on QueryBuilder<Pasien, Pasien, QDistinct> {
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByFacilityId({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByFacilityId(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'facilityId', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByFingerprintHash({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByFingerprintHash(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(
-        r'fingerprintHash',
-        caseSensitive: caseSensitive,
-      );
+      return query.addDistinctBy(r'fingerprintHash',
+          caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByJenisKelamin({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByJenisKelamin(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'jenisKelamin', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByLocalStatus({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByLocalStatus(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'localStatus', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByMedicalRecordNumber({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByMedicalRecordNumber(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(
-        r'medicalRecordNumber',
-        caseSensitive: caseSensitive,
-      );
+      return query.addDistinctBy(r'medicalRecordNumber',
+          caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByNamaLengkap({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByNamaLengkap(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'namaLengkap', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByNoKtp({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByNoKtp(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'noKtp', caseSensitive: caseSensitive);
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByRemoteId({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByRemoteId(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'remoteId', caseSensitive: caseSensitive);
     });
@@ -2134,9 +1976,8 @@ extension PasienQueryWhereDistinct on QueryBuilder<Pasien, Pasien, QDistinct> {
     });
   }
 
-  QueryBuilder<Pasien, Pasien, QDistinct> distinctByTempatLahir({
-    bool caseSensitive = true,
-  }) {
+  QueryBuilder<Pasien, Pasien, QDistinct> distinctByTempatLahir(
+      {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'tempatLahir', caseSensitive: caseSensitive);
     });
@@ -2175,7 +2016,7 @@ extension PasienQueryProperty on QueryBuilder<Pasien, Pasien, QQueryProperty> {
   }
 
   QueryBuilder<Pasien, String?, QQueryOperations>
-  medicalRecordNumberProperty() {
+      medicalRecordNumberProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'medicalRecordNumber');
     });

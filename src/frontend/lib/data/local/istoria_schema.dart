@@ -20,15 +20,30 @@ class IstoriaKlinis {
   DateTime? tanggalKunjungan;
 
   Map<String, dynamic> toApiJson() => {
-        'pasien_id': pasienId,
-        'tenant_id': tenantId,
-        'keluhan_subjektif': keluhanSubjektif,
-        'pemeriksaan_objektif': pemeriksaanObjektif,
-        'analisis_asesmen': analisisAsesmen,
-        'rencana_tindakan': rencanaTindakan,
-        'kode_icd10': kodeIcd10,
-        'nama_penyakit_lokal': namaPenyakitLokal,
-      };
+    'pasien_id': pasienId,
+    'tenant_id': tenantId,
+    'keluhan_subjektif': keluhanSubjektif,
+    'pemeriksaan_objektif': pemeriksaanObjektif,
+    'analisis_asesmen': analisisAsesmen,
+    'rencana_tindakan': rencanaTindakan,
+    'kode_icd10': kodeIcd10,
+    'nama_penyakit_lokal': namaPenyakitLokal,
+  };
+
+  /// Offline sync payload. `tenant_id` is intentionally omitted: it is a
+  /// server owned field and the API rejects any client supplied value.
+  Map<String, dynamic> toSyncPayload() => {
+    'kunjungan_id': remoteId,
+    'pasien_id': pasienId,
+    if (tanggalKunjungan != null) 'visit_date': tanggalKunjungan!.toIso8601String(),
+    'keluhan_subjektif': keluhanSubjektif,
+    'pemeriksaan_objektif': pemeriksaanObjektif,
+    'analisis_asesmen': analisisAsesmen,
+    'rencana_tindakan': rencanaTindakan,
+    'kode_icd10': kodeIcd10,
+    'nama_penyakit_lokal': namaPenyakitLokal,
+  };
+
 
   static IstoriaKlinis fromApiJson(Map<String, dynamic> json) {
     return IstoriaKlinis()

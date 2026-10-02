@@ -126,4 +126,34 @@ class ApiClient {
       throw ApiException.fromDio(error);
     }
   }
+
+  /// Submits one queued offline operation.
+  ///
+  /// `operationId` is the stable idempotency key: retrying the same operation
+  /// reuses it, so the server never creates a duplicate medical record.
+  Future<Map<String, dynamic>> submitSyncOperation({
+    required String operationId,
+    required String entityType,
+    required String entityId,
+    required String operationType,
+    required Map<String, dynamic> payload,
+  }) async {
+    try {
+      final response = await dio.post<Map<String, dynamic>>(
+        '/sync/operations',
+        data: {
+          'operation': {
+            'operation_id': operationId,
+            'entity_type': entityType,
+            'entity_id': entityId,
+            'operation_type': operationType,
+            'payload': payload,
+          },
+        },
+      );
+      return response.data ?? <String, dynamic>{};
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
 }

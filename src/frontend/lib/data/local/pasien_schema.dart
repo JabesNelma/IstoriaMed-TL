@@ -27,6 +27,13 @@ class Pasien {
     if (fingerprintHash != null) 'fingerprint_hash': fingerprintHash,
   };
 
+  /// Offline sync payload. Contains clinical data only: facility, tenant and
+  /// staff ownership are always derived by the server from the session.
+  Map<String, dynamic> toSyncPayload() => {
+    'patient_id': remoteId,
+    ...toApiJson(),
+  };
+
   static Pasien fromApiJson(Map<String, dynamic> json) {
     final pasien = Pasien()
       ..remoteId = json['user_id'] as String?
