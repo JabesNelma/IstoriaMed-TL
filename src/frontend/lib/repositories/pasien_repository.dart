@@ -2,6 +2,7 @@ import 'package:isar/isar.dart';
 
 import '../data/local/pasien_schema.dart';
 import '../data/remote/api_client.dart';
+import '../data/remote/api_exception.dart';
 
 class PasienRepository {
   PasienRepository({required this.isar, required this.apiClient});
@@ -30,10 +31,18 @@ class PasienRepository {
       final response = await apiClient.registerPasien(pasien);
       final data = response['data'];
       if (data is List && data.isNotEmpty && data.first is Map) {
-        pasien.remoteId = (data.first as Map)['user_id'] as String?;
+        final remote = data.first as Map;
+        pasien.remoteId = remote['user_id'] as String?;
+        pasien.medicalRecordNumber = remote['medical_record_number'] as String?;
+        pasien.facilityId = remote['facility_id'] as String?;
       }
       pasien.localStatus = 'Synced';
-    } catch (_) {
+    } on ApiException catch (error) {
+      if (!error.isNetworkFailure) {
+        pasien.localStatus = 'Failed';
+        await isar.writeTxn(() => isar.pasiens.put(pasien));
+        rethrow;
+      }
       pasien.localStatus = 'Pending';
     }
     await isar.writeTxn(() => isar.pasiens.put(pasien));

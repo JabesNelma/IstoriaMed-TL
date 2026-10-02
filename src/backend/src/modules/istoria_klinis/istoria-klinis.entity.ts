@@ -3,13 +3,17 @@ export type StatusSinkronisasi = 'Pending' | 'Synced' | 'Failed';
 export class IstoriaKlinisEntity {
 	kunjungan_id: string;
 	pasien_id: string;
+	facility_id?: string;
 	tenant_id: string;
+	staf_id?: string;
 	tanggal_kunjungan: Date;
 	keluhan_subjektif: string;
-	pemeriksaan_objektif: string;
-	analisis_asesmen: string;
-	rencana_tindakan: string;
+	pemeriksaan_objektif?: string;
+	analisis_asesmen?: string;
+	rencana_tindakan?: string;
 	kode_icd10: string;
-	nama_penyakit_lokal: string;
+	nama_penyakit_lokal?: string;
 	status_sinkronisasi: StatusSinkronisasi;
+	created_at: Date;
+	updated_at: Date;
 }

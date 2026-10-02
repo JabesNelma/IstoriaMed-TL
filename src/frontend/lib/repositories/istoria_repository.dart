@@ -2,6 +2,7 @@ import 'package:isar/isar.dart';
 
 import '../data/local/istoria_schema.dart';
 import '../data/remote/api_client.dart';
+import '../data/remote/api_exception.dart';
 
 class IstoriaRepository {
   IstoriaRepository({required this.isar, required this.apiClient});
@@ -25,13 +26,19 @@ class IstoriaRepository {
           await isar.istoriaKlinis.put(record);
         }
       });
-    } catch (_) {}
+    } on ApiException catch (error) {
+      if (!error.isNetworkFailure) rethrow;
+    }
 
     return (await isar.istoriaKlinis.where().findAll())
         .where((record) => record.pasienId == pasienId)
         .toList()
-      ..sort((a, b) => (b.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0))
-          .compareTo(a.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0)));
+      ..sort(
+        (a, b) => (b.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(
+              a.tanggalKunjungan ?? DateTime.fromMillisecondsSinceEpoch(0),
+            ),
+      );
   }
 
   Future<void> syncPending() async {
@@ -51,7 +58,12 @@ class IstoriaRepository {
           ? istoria.tanggalKunjungan
           : DateTime.parse(response['tanggal_kunjungan'] as String);
       istoria.syncStatus = 'Synced';
-    } catch (_) {
+    } on ApiException catch (error) {
+      if (!error.isNetworkFailure) {
+        istoria.syncStatus = 'Failed';
+        await isar.writeTxn(() => isar.istoriaKlinis.put(istoria));
+        rethrow;
+      }
       istoria.syncStatus = 'Pending';
     }
     await isar.writeTxn(() => isar.istoriaKlinis.put(istoria));
