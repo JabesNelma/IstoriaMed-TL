@@ -1,11 +1,16 @@
 import '../../data/remote/api_exception.dart';
 
-/// Entity types supported by the offline queue in Phase 6.
+/// Entity types supported by the offline queue.
+///
+/// Phase 7 extends the Phase 6 queue with `PRESCRIPTION`, which reuses the same
+/// operation, idempotency and retry machinery. The medication catalog is
+/// deliberately absent: it is server owned reference data and is never queued.
 abstract final class SyncEntityType {
   static const patient = 'PATIENT';
   static const clinicalVisit = 'CLINICAL_VISIT';
+  static const prescription = 'PRESCRIPTION';
 
-  static const supported = <String>[patient, clinicalVisit];
+  static const supported = <String>[patient, clinicalVisit, prescription];
 }
 
 /// Operation types supported by the offline queue in Phase 6.

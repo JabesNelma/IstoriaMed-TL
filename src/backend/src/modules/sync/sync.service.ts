@@ -18,10 +18,12 @@ import { PatientRecord } from '../../database/entities/patient.record';
 import { StaffRecord } from '../../database/entities/staff.record';
 import { SyncOperationRecord } from '../../database/entities/sync-operation.record';
 import { AuthenticatedMembership, AuthenticatedUser } from '../auth/auth.types';
+import { PrescriptionService } from '../prescription/prescription.service';
 import {
   PROTECTED_PAYLOAD_FIELDS,
   SyncClinicalVisitPayloadDto,
   SyncPatientPayloadDto,
+  SyncPrescriptionPayloadDto,
   SyncRecordDto,
 } from './dto/sync.dto';
 
@@ -70,6 +72,7 @@ function errorMessage(error: unknown): string {
 export class SyncService {
   constructor(
     private readonly dataSource: DataSource,
+    private readonly prescriptionService: PrescriptionService,
     @InjectRepository(SyncOperationRecord)
     private readonly syncOperationRepository: Repository<SyncOperationRecord>,
   ) {}
@@ -183,7 +186,41 @@ export class SyncService {
   private async execute(manager: EntityManager, data: SyncRecordDto, user: AuthenticatedUser): Promise<ExecutedEntity> {
     if (data.entity_type === 'PATIENT') return this.executePatient(manager, data, user);
     if (data.entity_type === 'CLINICAL_VISIT') return this.executeClinicalVisit(manager, data, user);
+    if (data.entity_type === 'PRESCRIPTION') return this.executePrescription(manager, data, user);
     throw new BadRequestException('Unsupported entity type.');
+  }
+
+  /**
+   * Reuses the online prescription write path so offline and online prescriptions
+   * share one authorization implementation and one transactional boundary.
+   *
+   * The client side queue orders this operation after the clinical visit it
+   * belongs to, so by the time it is processed the visit already exists on the
+   * server. If it does not, the operation fails permanently rather than creating
+   * an orphan prescription.
+   */
+  private async executePrescription(manager: EntityManager, data: SyncRecordDto, user: AuthenticatedUser): Promise<ExecutedEntity> {
+    const payload = await this.parsePayload(SyncPrescriptionPayloadDto, data);
+    this.resolveMembership(user);
+
+    const prescription = await this.prescriptionService.createWithinTransaction(
+      manager,
+      payload,
+      user,
+      payload.prescription_id,
+    );
+
+    return {
+      entity_id: prescription.prescription_id,
+      entity: {
+        visit_id: prescription.visit_id,
+        prescribed_by_staff_id: prescription.prescribed_by_staff_id,
+        facility_id: prescription.facility_id,
+        tenant_id: prescription.tenant_id,
+        prescribed_at: prescription.prescribed_at,
+        item_count: prescription.items.length,
+      },
+    };
   }
 
   private resolveMembership(user: AuthenticatedUser): AuthenticatedMembership {

@@ -50,6 +50,17 @@ ResponseBody jsonResponse(int statusCode, Map<String, dynamic> body) {
   );
 }
 
+/// Response body for endpoints that answer with a JSON array.
+ResponseBody jsonListResponse(int statusCode, List<dynamic> body) {
+  return ResponseBody.fromString(
+    jsonEncode(body),
+    statusCode,
+    headers: {
+      Headers.contentTypeHeader: [Headers.jsonContentType],
+    },
+  );
+}
+
 ResponseBody emptyResponse(int statusCode) {
   return ResponseBody.fromString(
     '',

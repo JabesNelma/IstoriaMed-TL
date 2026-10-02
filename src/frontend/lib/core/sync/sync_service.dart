@@ -2,6 +2,7 @@ import 'package:isar/isar.dart';
 
 import '../../data/local/istoria_schema.dart';
 import '../../data/local/pasien_schema.dart';
+import '../../data/local/prescription_schema.dart';
 import '../../data/local/sync_operation_schema.dart';
 import '../../data/remote/api_client.dart';
 import '../../data/remote/api_exception.dart';
@@ -139,12 +140,18 @@ class SyncService {
     final visit = operation.entityType == SyncEntityType.clinicalVisit
         ? await isar.istoriaKlinis.get(operation.localEntityId)
         : null;
+    final prescription = operation.entityType == SyncEntityType.prescription
+        ? await isar.prescriptions.get(operation.localEntityId)
+        : null;
 
     if (operation.entityType == SyncEntityType.patient && patient == null) {
       return _markFailed(operation, 'Local patient record is missing.');
     }
     if (operation.entityType == SyncEntityType.clinicalVisit && visit == null) {
       return _markFailed(operation, 'Local clinical visit record is missing.');
+    }
+    if (operation.entityType == SyncEntityType.prescription && prescription == null) {
+      return _markFailed(operation, 'Local prescription record is missing.');
     }
 
     operation.status = SyncStatus.syncing;
@@ -158,9 +165,13 @@ class SyncService {
         entityType: operation.entityType,
         entityId: operation.entityId,
         operationType: operation.operationType,
-        payload: patient != null ? patient.toSyncPayload() : visit!.toSyncPayload(),
+        payload: patient != null
+            ? patient.toSyncPayload()
+            : visit != null
+                ? visit.toSyncPayload()
+                : prescription!.toSyncPayload(),
       );
-      return _applyResponse(operation, response, patient, visit);
+      return _applyResponse(operation, response, patient, visit, prescription);
     } on ApiException catch (error) {
       return _applyFailure(operation, classifySyncFailure(error));
     } on Object catch (error) {
@@ -194,6 +205,7 @@ class SyncService {
     Map<String, dynamic> response,
     Pasien? patient,
     IstoriaKlinis? visit,
+    Prescription? prescription,
   ) async {
     final status = response['status'];
     final message = response['message'] is String ? response['message'] as String : null;
@@ -226,6 +238,19 @@ class SyncService {
         }
         await isar.istoriaKlinis.put(visit);
       }
+      if (prescription != null) {
+        prescription.syncStatus = SyncLocalStatus.synced;
+        prescription.remoteId = entityId ?? prescription.remoteId;
+        if (entity is Map) {
+          final details = Map<String, dynamic>.from(entity);
+          // The server is the only source of truth for ownership.
+          prescription.prescribedByStaffId =
+              details['prescribed_by_staff_id'] as String? ?? prescription.prescribedByStaffId;
+          prescription.facilityId = details['facility_id'] as String? ?? prescription.facilityId;
+          prescription.tenantId = details['tenant_id'] as String? ?? prescription.tenantId;
+        }
+        await isar.prescriptions.put(prescription);
+      }
       operation.status = SyncStatus.synced;
       operation.lastError = null;
       operation.nextAttemptAt = null;
@@ -252,11 +277,17 @@ class SyncService {
           patient.localStatus = SyncLocalStatus.pending;
           await isar.pasiens.put(patient);
         }
-      } else {
+      } else if (operation.entityType == SyncEntityType.clinicalVisit) {
         final visit = await isar.istoriaKlinis.get(operation.localEntityId);
         if (visit != null) {
           visit.syncStatus = SyncLocalStatus.pending;
           await isar.istoriaKlinis.put(visit);
+        }
+      } else if (operation.entityType == SyncEntityType.prescription) {
+        final prescription = await isar.prescriptions.get(operation.localEntityId);
+        if (prescription != null) {
+          prescription.syncStatus = SyncLocalStatus.pending;
+          await isar.prescriptions.put(prescription);
         }
       }
       await isar.syncOperations.put(operation);
@@ -277,11 +308,17 @@ class SyncService {
           patient.localStatus = SyncLocalStatus.failed;
           await isar.pasiens.put(patient);
         }
-      } else {
+      } else if (operation.entityType == SyncEntityType.clinicalVisit) {
         final visit = await isar.istoriaKlinis.get(operation.localEntityId);
         if (visit != null) {
           visit.syncStatus = SyncLocalStatus.failed;
           await isar.istoriaKlinis.put(visit);
+        }
+      } else if (operation.entityType == SyncEntityType.prescription) {
+        final prescription = await isar.prescriptions.get(operation.localEntityId);
+        if (prescription != null) {
+          prescription.syncStatus = SyncLocalStatus.failed;
+          await isar.prescriptions.put(prescription);
         }
       }
       await isar.syncOperations.put(operation);

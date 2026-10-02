@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 import '../local/istoria_schema.dart';
 import '../local/pasien_schema.dart';
+import '../local/prescription_schema.dart';
 import 'api_exception.dart';
 
 class ApiClient {
@@ -122,6 +123,72 @@ class ApiClient {
       return (response.data ?? const <dynamic>[])
           .whereType<Map<String, dynamic>>()
           .toList();
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  /// Reads the medication catalog.
+  ///
+  /// The catalog is server owned reference data: it is global, never tenant or
+  /// facility scoped, and is never queued for offline synchronization.
+  Future<List<Map<String, dynamic>>> getMedications({
+    String? query,
+    bool includeInactive = false,
+  }) async {
+    try {
+      final response = await dio.get<List<dynamic>>(
+        '/medications',
+        queryParameters: <String, dynamic>{
+          if (query != null && query.isNotEmpty) 'q': query,
+          'include_inactive': includeInactive,
+        },
+      );
+      return (response.data ?? const <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .toList();
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  Future<Map<String, dynamic>> getMedication(String medicationId) async {
+    try {
+      final response = await dio.get<Map<String, dynamic>>('/medications/$medicationId');
+      return response.data ?? <String, dynamic>{};
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getPrescriptionsByVisit(String visitId) async {
+    try {
+      final response = await dio.get<List<dynamic>>('/prescriptions/visit/$visitId');
+      return (response.data ?? const <dynamic>[])
+          .whereType<Map<String, dynamic>>()
+          .toList();
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  Future<Map<String, dynamic>> getPrescription(String prescriptionId) async {
+    try {
+      final response = await dio.get<Map<String, dynamic>>('/prescriptions/$prescriptionId');
+      return response.data ?? <String, dynamic>{};
+    } on DioException catch (error) {
+      throw ApiException.fromDio(error);
+    }
+  }
+
+  /// Online prescription create, used when the device has connectivity.
+  Future<Map<String, dynamic>> createPrescription(Prescription prescription) async {
+    try {
+      final response = await dio.post<Map<String, dynamic>>(
+        '/prescriptions',
+        data: prescription.toApiJson(),
+      );
+      return response.data ?? <String, dynamic>{};
     } on DioException catch (error) {
       throw ApiException.fromDio(error);
     }

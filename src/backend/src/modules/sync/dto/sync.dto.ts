@@ -3,8 +3,9 @@ import { IsEnum, IsNotEmpty, IsObject, IsOptional, IsString, IsUUID, ValidateNes
 
 import { CreatePatientDto } from '../../pasien/dto/patient.dto';
 import { CreateIstoriaKlinisDto } from '../../istoria_klinis/dto/create-istoria-klinis.dto';
+import { CreatePrescriptionDto } from '../../prescription/dto/prescription.dto';
 
-export const SYNC_ENTITY_TYPES = ['PATIENT', 'CLINICAL_VISIT'] as const;
+export const SYNC_ENTITY_TYPES = ['PATIENT', 'CLINICAL_VISIT', 'PRESCRIPTION'] as const;
 export const SYNC_OPERATION_TYPES = ['CREATE'] as const;
 
 export type SyncEntityType = (typeof SYNC_ENTITY_TYPES)[number];
@@ -14,6 +15,11 @@ export type SyncOperationType = (typeof SYNC_OPERATION_TYPES)[number];
  * The server always derives ownership from the authenticated user
  * (user -> membership -> facility -> tenant -> staff).
  * A client may never submit these fields.
+ *
+ * Reserved entity identifiers such as `patient_id`, `kunjungan_id` and
+ * `prescription_id` are deliberately NOT protected: following the Phase 6
+ * convention the device reserves them before going offline and the server adopts
+ * them verbatim. Only ownership and server bookkeeping are protected.
  */
 export const PROTECTED_PAYLOAD_FIELDS = [
   'facility_id',
@@ -25,6 +31,7 @@ export const PROTECTED_PAYLOAD_FIELDS = [
   'status_sinkronisasi',
   'medical_record_number',
   'tanggal_terdaftar',
+  'prescribed_by_staff_id',
   'created_at',
   'updated_at',
   'processed_at',
@@ -40,6 +47,19 @@ export class SyncPatientPayloadDto extends CreatePatientDto {
 export class SyncClinicalVisitPayloadDto extends CreateIstoriaKlinisDto {
   @IsUUID()
   kunjungan_id!: string;
+}
+
+/**
+ * Offline payload for a prescription CREATE operation.
+ *
+ * `prescription_id` is the canonical identifier the device reserved before going
+ * offline; the server adopts it verbatim so no identifier mapping is needed.
+ * Ownership (`prescribed_by_staff_id`, `facility_id`, `tenant_id`) is derived by
+ * the server exactly like it is for the online endpoint.
+ */
+export class SyncPrescriptionPayloadDto extends CreatePrescriptionDto {
+  @IsUUID()
+  prescription_id!: string;
 }
 
 export class SyncRecordDto {

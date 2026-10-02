@@ -1,6 +1,6 @@
 import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 
-export type SyncEntityType = 'PATIENT' | 'CLINICAL_VISIT';
+export type SyncEntityType = 'PATIENT' | 'CLINICAL_VISIT' | 'PRESCRIPTION';
 export type SyncOperationType = 'CREATE';
 export type SyncOperationStatus = 'PENDING' | 'SYNCING' | 'SYNCED' | 'FAILED';
 

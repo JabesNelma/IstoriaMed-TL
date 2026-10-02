@@ -29,6 +29,11 @@ describe('Database persistence (e2e)', () => {
   beforeEach(async () => {
     app = await createApp();
     const database = app.get(DataSource);
+    // Phase 7: prescriptions RESTRICT their visit, staff and medication
+    // references, so clinical records must be cleared children first.
+    await database.query('DELETE FROM prescription_items');
+    await database.query('DELETE FROM prescriptions');
+    await database.query('DELETE FROM medications');
     await database.query('DELETE FROM clinical_visits');
     await database.query('DELETE FROM patients');
     await database.query('DELETE FROM staff_profiles');

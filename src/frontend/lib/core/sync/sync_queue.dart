@@ -3,6 +3,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../data/local/istoria_schema.dart';
 import '../../data/local/pasien_schema.dart';
+import '../../data/local/prescription_schema.dart';
 import '../../data/local/sync_operation_schema.dart';
 import 'sync_types.dart';
 
@@ -85,6 +86,53 @@ abstract final class SyncQueue {
           ..updatedAt = timestamp,
       );
       return visit;
+    });
+  }
+
+  /// Queues a prescription CREATE, atomically with the prescription itself.
+  ///
+  /// This is the Phase 7 extension of the Phase 6 queue: it reuses the same
+  /// operation, idempotency key, dependency and retry machinery rather than
+  /// introducing a second queue.
+  ///
+  /// When the referenced clinical visit still has an unsynchronized CREATE
+  /// operation the prescription is linked to it, so the queue can never send a
+  /// prescription whose visit does not exist on the server yet.
+  static Future<Prescription> enqueuePrescription(
+    Isar isar,
+    Prescription prescription, {
+    String? operationId,
+    DateTime? now,
+  }) async {
+    final timestamp = now ?? DateTime.now();
+    return isar.writeTxn(() async {
+      prescription.syncStatus = SyncLocalStatus.pending;
+      // Reserved by the device so the server adopts this exact identifier and
+      // the item identifiers stay stable across retries.
+      prescription.remoteId ??= _uuid.v4();
+      final localId = await isar.prescriptions.put(prescription);
+      prescription.id = localId;
+      final visitOperation = await isar.syncOperations
+          .filter()
+          .entityIdEqualTo(prescription.visitId)
+          .entityTypeEqualTo(SyncEntityType.clinicalVisit)
+          .findFirst();
+      await isar.syncOperations.put(
+        SyncOperation()
+          ..operationId = operationId ?? _uuid.v4()
+          ..entityType = SyncEntityType.prescription
+          ..localEntityId = localId
+          ..entityId = prescription.remoteId!
+          ..operationType = SyncOperationType.create
+          ..status = SyncStatus.pending
+          ..retryCount = 0
+          ..dependsOnOperationId = visitOperation != null && visitOperation.status != SyncStatus.synced
+              ? visitOperation.operationId
+              : null
+          ..createdAt = timestamp
+          ..updatedAt = timestamp,
+      );
+      return prescription;
     });
   }
 

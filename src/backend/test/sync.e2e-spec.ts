@@ -132,6 +132,11 @@ describe('Offline sync operations (e2e)', () => {
     app = await createApp();
     database = app.get(DataSource);
     await database.query('DELETE FROM sync_operations');
+    // Phase 7: prescriptions RESTRICT their visit, staff and medication
+    // references, so clinical records must be cleared children first.
+    await database.query('DELETE FROM prescription_items');
+    await database.query('DELETE FROM prescriptions');
+    await database.query('DELETE FROM medications');
     await database.query('DELETE FROM clinical_visits');
     await database.query('DELETE FROM patients');
     await database.query('DELETE FROM staff_profiles');
@@ -235,7 +240,9 @@ describe('Offline sync operations (e2e)', () => {
       .set('Authorization', `Bearer ${doctorAToken}`)
       .send({ operation: { operation_id: 'not-a-uuid', entity_type: 'PATIENT', operation_type: 'CREATE', entity_id: randomUUID(), payload: {} } })
       .expect(400);
-    await sendOperation(doctorAToken, { ...patientOperation(), entity_type: 'PRESCRIPTION' as 'PATIENT' }).expect(400);
+    // Phase 7 made PRESCRIPTION a supported sync type, so the unsupported-type
+    // guard is now exercised with a type that is still unknown.
+    await sendOperation(doctorAToken, { ...patientOperation(), entity_type: 'LAB_RESULT' as 'PATIENT' }).expect(400);
   });
 
   it('5. rejects a clinical visit that targets another facility', async () => {

@@ -9,6 +9,17 @@ import { CreateIstoriaKlinisDto, UpdateIstoriaKlinisDto } from './dto/create-ist
 import { IstoriaKlinisEntity } from './istoria-klinis.entity';
 import { AuthenticatedUser } from '../auth/auth.types';
 
+/** One facility membership as an exact (facility, tenant) authorization pair. */
+interface MembershipPair {
+	facilityId: string;
+	tenantId: string;
+}
+
+interface VisitScope {
+	sql: string;
+	parameters: Record<string, string | string[]>;
+}
+
 @Injectable()
 export class IstoriaKlinisService {
 	constructor(
@@ -64,52 +75,59 @@ export class IstoriaKlinisService {
 	}
 
 	async findAll(user: AuthenticatedUser): Promise<IstoriaKlinisEntity[]> {
-		const facilityIds = [...new Set(user.memberships.map((item) => item.facility_id))];
-		const tenantIds = [...new Set(user.memberships.map((item) => item.tenant_id))];
-		if (!facilityIds.length && !tenantIds.length) return [];
+		const scope = this.visitScope('visit', user);
+		if (!scope) return [];
 		const records = await this.visitRepository.createQueryBuilder('visit')
-			.where('(visit.facility_id IN (:...facilityIds) OR visit.tenant_id IN (:...tenantIds))', { facilityIds, tenantIds })
+			.where(scope.sql, scope.parameters)
 			.orderBy('visit.tanggal_kunjungan', 'DESC')
 			.getMany();
 		return records.map((record) => this.toEntity(record));
 	}
 
 	async findOne(id: string, user: AuthenticatedUser): Promise<IstoriaKlinisEntity> {
-		const facilityIds = [...new Set(user.memberships.map((item) => item.facility_id))];
-		const tenantIds = [...new Set(user.memberships.map((item) => item.tenant_id))];
+		const scope = this.visitScope('visit', user);
+		if (!scope) throw new NotFoundException('Clinical visit not found.');
 		const record = await this.visitRepository.createQueryBuilder('visit')
 			.where('visit.kunjungan_id = :id', { id })
-			.andWhere('(visit.facility_id IN (:...facilityIds) OR visit.tenant_id IN (:...tenantIds))', { facilityIds, tenantIds })
+			.andWhere(scope.sql, scope.parameters)
 			.getOne();
 		if (!record) throw new NotFoundException('Clinical visit not found.');
 		return this.toEntity(record);
 	}
 
 	async findByPatient(pasienId: string, user: AuthenticatedUser): Promise<IstoriaKlinisEntity[]> {
-		const facilityIds = [...new Set(user.memberships.map((item) => item.facility_id))];
-		const tenantIds = [...new Set(user.memberships.map((item) => item.tenant_id))];
 		const patient = await this.pasienService.findOneForUser(pasienId, user);
+		if (!patient) return [];
+		const scope = this.visitScope('visit', user);
+		if (!scope) return [];
 		const records = await this.visitRepository.createQueryBuilder('visit')
 			.where('visit.pasien_id = :pasienId', { pasienId })
-			.andWhere('(visit.facility_id IN (:...facilityIds) OR visit.tenant_id IN (:...tenantIds))', { facilityIds, tenantIds })
+			.andWhere(scope.sql, scope.parameters)
 			.orderBy('visit.tanggal_kunjungan', 'DESC')
 			.getMany();
-		if (!patient) return [];
 		return records.map((record) => this.toEntity(record));
 	}
 
 	async findByTenant(tenantId: string, user: AuthenticatedUser): Promise<IstoriaKlinisEntity[]> {
 		if (!user.memberships.some((item) => item.tenant_id === tenantId)) throw new ForbiddenException('Facility access denied.');
-		const records = await this.visitRepository.find({ where: { tenant_id: tenantId }, order: { tanggal_kunjungan: 'DESC' } });
+		const scope = this.visitScope('visit', user);
+		if (!scope) return [];
+		const records = await this.visitRepository.createQueryBuilder('visit')
+			.where('visit.tenant_id = :tenantId', { tenantId })
+			.andWhere(scope.sql, scope.parameters)
+			.orderBy('visit.tanggal_kunjungan', 'DESC')
+			.getMany();
 		return records.map((record) => this.toEntity(record));
 	}
 
 	async update(id: string, data: UpdateIstoriaKlinisDto, user: AuthenticatedUser): Promise<IstoriaKlinisEntity> {
 		const record = await this.visitRepository.findOne({ where: { kunjungan_id: id } });
 		if (!record) throw new NotFoundException('Clinical visit not found.');
-		const allowedTenants = user.memberships.map((item) => item.tenant_id);
-		const allowedFacilities = user.memberships.map((item) => item.facility_id);
-		if (!allowedTenants.includes(record.tenant_id) && !allowedFacilities.includes(record.facility_id ?? '')) {
+		// Exact pair check. The previous deny condition used
+		// `!tenantMatches && !facilityMatches`, which permits the write when
+		// either value matches and therefore allowed a cross facility edit of
+		// another tenant's clinical record.
+		if (!this.canAccessVisit(record, user)) {
 			throw new ForbiddenException('Clinical visit access denied.');
 		}
 		if (data.visit_date !== undefined) record.tanggal_kunjungan = new Date(data.visit_date);
@@ -121,6 +139,56 @@ export class IstoriaKlinisService {
 		if (data.nama_penyakit_lokal !== undefined) record.nama_penyakit_lokal = data.nama_penyakit_lokal ?? null;
 		record.updated_at = new Date();
 		return this.toEntity(await this.visitRepository.save(record));
+	}
+
+	/**
+	 * Builds an exact (facility, tenant) pair predicate.
+	 *
+	 * The previous implementation matched `facility_id IN (...) OR
+	 * tenant_id IN (...)`, which is not pair safe. A clinical visit whose
+	 * `tenant_id` column disagrees with the tenant that actually owns its
+	 * facility was then disclosed to every member of that tenant and could also
+	 * be modified by them. Legacy visits that predate facility assignment have
+	 * no facility, so they stay visible to their own tenant only.
+	 */
+	private visitScope(alias: string, user: AuthenticatedUser): VisitScope | undefined {
+		const pairs: MembershipPair[] = [
+			...new Map(
+				user.memberships.map((membership) => [
+					`${membership.facility_id}|${membership.tenant_id}`,
+					{ facilityId: membership.facility_id, tenantId: membership.tenant_id },
+				]),
+			).values(),
+		];
+		const legacyTenantIds = [...new Set(user.memberships.map((membership) => membership.tenant_id))];
+
+		const clauses: string[] = [];
+		const parameters: Record<string, string | string[]> = {};
+		pairs.forEach((pair, index) => {
+			clauses.push(`(${alias}.facility_id = :facilityId${index} AND ${alias}.tenant_id = :tenantId${index})`);
+			parameters[`facilityId${index}`] = pair.facilityId;
+			parameters[`tenantId${index}`] = pair.tenantId;
+		});
+		if (legacyTenantIds.length) {
+			clauses.push(`(${alias}.facility_id IS NULL AND ${alias}.tenant_id IN (:...legacyTenantIds))`);
+			parameters['legacyTenantIds'] = legacyTenantIds;
+		}
+		// The whole disjunction is wrapped in parentheses. Without them SQL
+		// precedence binds `AND` before `OR`, so a row matching any later branch
+		// would escape the caller's primary key filter and the `:id` lookup would
+		// silently return an arbitrary in-scope record instead of 404.
+		return clauses.length ? { sql: `(${clauses.join(' OR ')})`, parameters } : undefined;
+	}
+
+	/** The same pair rule as `visitScope`, applied to one already loaded row. */
+	private canAccessVisit(record: ClinicalVisitRecord, user: AuthenticatedUser): boolean {
+		if (!record.facility_id) {
+			return user.memberships.some((membership) => membership.tenant_id === record.tenant_id);
+		}
+		return user.memberships.some(
+			(membership) =>
+				membership.facility_id === record.facility_id && membership.tenant_id === record.tenant_id,
+		);
 	}
 
 	private toEntity(record: ClinicalVisitRecord): IstoriaKlinisEntity {
