@@ -12,7 +12,7 @@ import { Column, Entity, Index, PrimaryColumn } from 'typeorm';
 @Index('idx_medications_generic_name', ['generic_name'])
 @Index('idx_medications_is_active', ['is_active'])
 export class MedicationRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'medication_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'medication_id' })
   medication_id!: string;
 
   @Column({ type: 'varchar', length: 150 })
@@ -33,9 +33,9 @@ export class MedicationRecord {
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   updated_at!: Date;
 }

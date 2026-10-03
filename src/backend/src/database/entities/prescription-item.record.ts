@@ -16,17 +16,17 @@ import { PrescriptionRecord } from './prescription.record';
 @Index('idx_prescription_items_prescription_id', ['prescription_id'])
 @Index('idx_prescription_items_medication_id', ['medication_id'])
 export class PrescriptionItemRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'prescription_item_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'prescription_item_id' })
   prescription_item_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   prescription_id!: string;
 
   @ManyToOne(() => PrescriptionRecord, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'prescription_id', referencedColumnName: 'prescription_id' })
   prescription!: PrescriptionRecord;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   medication_id!: string;
 
   @ManyToOne(() => MedicationRecord, { nullable: false, onDelete: 'RESTRICT' })
@@ -51,9 +51,9 @@ export class PrescriptionItemRecord {
   @Column({ type: 'varchar', length: 500, nullable: true })
   instructions!: string | null;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   updated_at!: Date;
 }

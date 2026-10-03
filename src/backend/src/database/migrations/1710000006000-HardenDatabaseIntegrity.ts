@@ -24,9 +24,9 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * runtime, now enforced by the schema.
  *
  * Legacy clinical visits predate facility assignment and keep `facility_id IS
- * NULL`. PostgreSQL applies MATCH SIMPLE composite foreign keys only when every
- * referencing column is non-NULL, so those legacy rows stay valid and stay
- * visible to their own tenant through the authorization layer.
+ * NULL`. A composite foreign key is only enforced when every referencing column
+ * is non-NULL, so those legacy rows stay valid and stay visible to their own
+ * tenant through the authorization layer.
  *
  * No previously applied migration is edited.
  */
@@ -35,8 +35,9 @@ export class HardenDatabaseIntegrity1710000006000 implements MigrationInterface 
 
   async up(queryRunner: QueryRunner): Promise<void> {
     // Goal C: a tenant may own several facilities. The uniqueness that made that
-    // impossible is replaced by a plain lookup index.
-    await queryRunner.query('ALTER TABLE facilities DROP CONSTRAINT facilities_tenant_id_key');
+    // impossible is replaced by a plain lookup index. MySQL stores a UNIQUE
+    // constraint as an index, so it is dropped through DROP INDEX.
+    await queryRunner.query('ALTER TABLE facilities DROP INDEX facilities_tenant_id_key');
     await queryRunner.query('CREATE INDEX idx_facilities_tenant_id ON facilities (tenant_id)');
 
     // The pair (facility, tenant) is now the referential anchor for every
@@ -73,17 +74,24 @@ export class HardenDatabaseIntegrity1710000006000 implements MigrationInterface 
   }
 
   async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.query('ALTER TABLE prescriptions DROP CONSTRAINT fk_prescriptions_facility_tenant');
-    await queryRunner.query('ALTER TABLE clinical_visits DROP CONSTRAINT fk_clinical_visits_facility_tenant');
-    await queryRunner.query('ALTER TABLE clinical_visits DROP CONSTRAINT fk_clinical_visits_staf');
-    await queryRunner.query('ALTER TABLE facilities DROP CONSTRAINT uq_facilities_facility_tenant');
-    await queryRunner.query('DROP INDEX idx_facilities_tenant_id');
+    await queryRunner.query('ALTER TABLE prescriptions DROP FOREIGN KEY fk_prescriptions_facility_tenant');
+    await queryRunner.query('ALTER TABLE clinical_visits DROP FOREIGN KEY fk_clinical_visits_facility_tenant');
+    await queryRunner.query('ALTER TABLE clinical_visits DROP FOREIGN KEY fk_clinical_visits_staf');
+    await queryRunner.query('ALTER TABLE facilities DROP INDEX uq_facilities_facility_tenant');
+    await queryRunner.query('DROP INDEX idx_facilities_tenant_id ON facilities');
+    // MySQL does not remove the supporting index when a foreign key is dropped,
+    // so the indexes it auto-created for the two keys above have to go too.
+    // `fk_clinical_visits_facility_tenant` in particular still covers
+    // facility_id and would otherwise block a later `DROP COLUMN facility_id`.
+    await queryRunner.query('DROP INDEX fk_prescriptions_facility_tenant ON prescriptions');
+    await queryRunner.query('DROP INDEX fk_clinical_visits_facility_tenant ON clinical_visits');
+    await queryRunner.query('DROP INDEX fk_clinical_visits_staf ON clinical_visits');
 
     // Reinstating UNIQUE (tenant_id) is only possible while every facility
     // still owns a distinct tenant. Fail loudly and descriptively instead of
-    // letting PostgreSQL emit an opaque constraint violation.
+    // letting the database emit an opaque constraint violation.
     const duplicates: Array<{ tenant_id: string; facility_count: number }> = await queryRunner.query(`
-      SELECT tenant_id, count(*)::int AS facility_count
+      SELECT tenant_id, count(*) AS facility_count
       FROM facilities
       GROUP BY tenant_id
       HAVING count(*) > 1

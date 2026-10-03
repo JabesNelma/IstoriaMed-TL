@@ -7,13 +7,13 @@ export type VerificationStatus = 'Pending' | 'Approved' | 'Rejected';
 
 @Entity({ name: 'staff_profiles' })
 export class StaffRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'staff_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'staff_id' })
   staff_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   user_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   facility_id!: string;
 
   @Column({ type: 'varchar', length: 50, unique: true })
@@ -25,7 +25,7 @@ export class StaffRecord {
   @Column({ type: 'varchar', length: 20, default: 'Pending' })
   verification_status!: VerificationStatus;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
   @ManyToOne('users', { onDelete: 'RESTRICT' })

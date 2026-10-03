@@ -22,24 +22,24 @@ import { StaffRecord } from './staff.record';
 @Index('idx_prescriptions_tenant_id', ['tenant_id'])
 @Index('idx_prescriptions_prescribed_at', ['prescribed_at'])
 export class PrescriptionRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'prescription_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'prescription_id' })
   prescription_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   visit_id!: string;
 
   @ManyToOne(() => ClinicalVisitRecord, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'visit_id', referencedColumnName: 'kunjungan_id' })
   visit!: ClinicalVisitRecord;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   prescribed_by_staff_id!: string;
 
   @ManyToOne(() => StaffRecord, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'prescribed_by_staff_id', referencedColumnName: 'staff_id' })
   prescribedByStaff!: StaffRecord;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   facility_id!: string;
 
   @ManyToOne(() => FacilityRecord, { nullable: false, onDelete: 'RESTRICT' })
@@ -49,15 +49,15 @@ export class PrescriptionRecord {
   @Column({ type: 'varchar', length: 100 })
   tenant_id!: string;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   prescribed_at!: Date;
 
   @Column({ type: 'text', nullable: true })
   notes!: string | null;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   updated_at!: Date;
 }

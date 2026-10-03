@@ -7,13 +7,13 @@ export type ApplicationRole = 'SUPER_ADMIN' | 'SYSTEM_ADMIN' | 'DOCTOR' | 'NURSE
 @Entity({ name: 'facility_memberships' })
 @Index('uq_facility_membership_user_facility', ['user_id', 'facility_id'], { unique: true })
 export class FacilityMembershipRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'membership_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'membership_id' })
   membership_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   user_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   facility_id!: string;
 
   @Column({ type: 'varchar', length: 30 })
@@ -22,7 +22,7 @@ export class FacilityMembershipRecord {
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
   @ManyToOne('users', { onDelete: 'RESTRICT' })

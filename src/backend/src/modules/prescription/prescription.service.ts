@@ -212,7 +212,7 @@ export class PrescriptionService {
   }
 
   private async tenantOfFacility(manager: EntityManager, facilityId: string): Promise<string | undefined> {
-    const row = (await manager.query('SELECT tenant_id FROM facilities WHERE facility_id = $1', [facilityId])) as
+    const row = (await manager.query('SELECT tenant_id FROM facilities WHERE facility_id = ?', [facilityId])) as
       Array<{ tenant_id: string }>;
     return row[0]?.tenant_id;
   }

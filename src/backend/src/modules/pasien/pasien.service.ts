@@ -7,6 +7,13 @@ import { AuthenticatedUser } from '../auth/auth.types';
 import { PasienEntity } from './pasien.entity';
 import { CreatePatientDto, SearchPatientDto, UpdatePatientDto } from './dto/patient.dto';
 
+/** Unique violation: PostgreSQL `23505`, MySQL/TiDB `ER_DUP_ENTRY` (1062). */
+function isUniqueViolation(error: unknown): boolean {
+	if (!(error instanceof QueryFailedError)) return false;
+	const code = (error as QueryFailedError & { driverError?: { code?: string | number } }).driverError?.code;
+	return code === '23505' || code === 'ER_DUP_ENTRY';
+}
+
 @Injectable()
 export class PasienService {
 	constructor(
@@ -42,7 +49,7 @@ export class PasienService {
 		try {
 			return this.toEntity(await this.patientRepository.save(record));
 		} catch (error) {
-			if (error instanceof QueryFailedError && (error as QueryFailedError & { driverError?: { code?: string } }).driverError?.code === '23505') {
+			if (isUniqueViolation(error)) {
 				throw new ConflictException("KTP ne'e rejistradu ona!");
 			}
 			throw error;
@@ -57,12 +64,15 @@ export class PasienService {
 			if (!facilityIds.length) return [];
 			query.andWhere('patient.facility_id IN (:...facilityIds)', { facilityIds });
 		}
-		if (search.q) {
-			query.andWhere(
-				'(patient.medical_record_number ILIKE :query OR patient.nama_lengkap ILIKE :query OR patient.no_ktp ILIKE :query)',
-				{ query: `%${search.q}%` },
-			);
-		}
+			if (search.q) {
+				// `LOWER(...) LIKE LOWER(...)` is the MySQL/TiDB equivalent of
+				// PostgreSQL's `ILIKE`: the comparison is case insensitive whatever
+				// collation the column was created with.
+				query.andWhere(
+					'(LOWER(patient.medical_record_number) LIKE LOWER(:query) OR LOWER(patient.nama_lengkap) LIKE LOWER(:query) OR LOWER(patient.no_ktp) LIKE LOWER(:query))',
+					{ query: `%${search.q}%` },
+				);
+			}
 		const records = await query.orderBy('patient.tanggal_terdaftar', 'DESC').take(50).getMany();
 		return records.map((record) => this.toEntity(record));
 	}
@@ -107,7 +117,7 @@ export class PasienService {
 		try {
 			return this.toEntity(await this.patientRepository.save(record));
 		} catch (error) {
-			if (error instanceof QueryFailedError && (error as QueryFailedError & { driverError?: { code?: string } }).driverError?.code === '23505') {
+			if (isUniqueViolation(error)) {
 				throw new ConflictException("KTP ne'e rejistradu ona!");
 			}
 			throw error;

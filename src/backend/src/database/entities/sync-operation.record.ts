@@ -8,13 +8,13 @@ export type SyncOperationStatus = 'PENDING' | 'SYNCING' | 'SYNCED' | 'FAILED';
 @Index('idx_sync_operations_status', ['status'])
 @Index('idx_sync_operations_created_at', ['created_at'])
 export class SyncOperationRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'operation_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'operation_id' })
   operation_id!: string;
 
   @Column({ type: 'varchar', length: 30 })
   entity_type!: SyncEntityType;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'char', length: 36, nullable: true })
   entity_id!: string | null;
 
   @Column({ type: 'varchar', length: 20 })
@@ -26,18 +26,18 @@ export class SyncOperationRecord {
   @Column({ type: 'int', default: 0 })
   retry_count!: number;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'json', nullable: true })
   payload!: Record<string, unknown> | null;
 
   @Column({ type: 'text', nullable: true })
   last_error!: string | null;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   updated_at!: Date;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  @Column({ type: 'datetime', nullable: true })
   processed_at!: Date | null;
 }

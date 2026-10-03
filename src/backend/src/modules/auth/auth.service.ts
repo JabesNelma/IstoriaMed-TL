@@ -46,8 +46,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials.');
     }
 
+    // Memberships resolve through the facility and its tenant. A suspended
+    // tenant (is_active = false) contributes no memberships, so the user has no
+    // scope anywhere in it — the one central enforcement point for tenant
+    // status. Suspension is reversible only by an authority whose own tenant is
+    // still active.
     const memberships = await this.membershipRepository.find({
-      where: { user_id: user.user_id, is_active: true },
+      where: { user_id: user.user_id, is_active: true, facility: { tenant: { is_active: true } } },
       relations: { facility: true },
     });
     const authenticatedUser: AuthenticatedUser = {
@@ -72,8 +77,10 @@ export class AuthService {
   async verifyPayload(payload: JwtPayload): Promise<AuthenticatedUser> {
     const user = await this.userRepository.findOne({ where: { user_id: payload.sub, is_active: true } });
     if (!user) throw new UnauthorizedException('User is inactive or does not exist.');
+    // Same rule as login: memberships of an inactive tenant are invisible, so
+    // every request re-derives scope from active tenants only.
     const memberships = await this.membershipRepository.find({
-      where: { user_id: user.user_id, is_active: true },
+      where: { user_id: user.user_id, is_active: true, facility: { tenant: { is_active: true } } },
       relations: { facility: true },
     });
     return {

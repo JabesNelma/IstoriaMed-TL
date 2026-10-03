@@ -49,6 +49,8 @@ describe('AppController (e2e)', () => {
   });
 
   afterEach(async () => {
-    await app.close();
+    // `?.` keeps a failed bootstrap from masking the real error with an
+    // unrelated "cannot read properties of undefined" from this hook.
+    await app?.close();
   });
 });

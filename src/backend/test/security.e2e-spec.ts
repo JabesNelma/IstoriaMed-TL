@@ -28,6 +28,14 @@ describe('Authentication and facility authorization (e2e)', () => {
 
   async function addFacilityMembership(userId: string, code: string, tenant: string, role: string) {
     const facilityId = randomUUID();
+    // Phase 9: tenant identity is an authoritative row now, so it must exist
+    // before the facility that references it.
+    await database.query(
+      `INSERT INTO tenants (tenant_id, name, is_active, created_at, updated_at)
+       VALUES ($1, $1, true, NOW(), NOW())
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenant],
+    );
     await database.query(
       `INSERT INTO facilities (facility_id, facility_code, facility_name, facility_type, tenant_id, created_at, updated_at)
        VALUES ($1, $2, $3, 'CHC', $4, NOW(), NOW())`,
@@ -54,6 +62,7 @@ describe('Authentication and facility authorization (e2e)', () => {
     await database.query('DELETE FROM staff_profiles');
     await database.query('DELETE FROM facility_memberships');
     await database.query('DELETE FROM facilities');
+    await database.query('DELETE FROM tenants');
     await database.query('DELETE FROM users');
 
     const userA = await request(app.getHttpServer()).post('/api/auth/register').send({ login_identifier: 'a@example.com', password: 'password-a-123' }).expect(201);
@@ -261,6 +270,12 @@ describe('Authentication and facility authorization (e2e)', () => {
     // become a shortcut into a sibling facility the caller has no membership in.
     const siblingFacilityId = randomUUID();
     await database.query(
+      `INSERT INTO tenants (tenant_id, name, is_active, created_at, updated_at)
+       VALUES ($1, $1, true, NOW(), NOW())
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenantA],
+    );
+    await database.query(
       `INSERT INTO facilities (facility_id, facility_code, facility_name, facility_type, tenant_id, created_at, updated_at)
        VALUES ($1, $2, 'Sibling Facility', 'CHC', $3, NOW(), NOW())`,
       [siblingFacilityId, `SIB-${randomUUID()}`, tenantA],
@@ -318,6 +333,12 @@ describe('Authentication and facility authorization (e2e)', () => {
     // Phase 8: tenant B now has a second facility, and none of it may leak to
     // a tenant A caller even though facility codes look interchangeable.
     const otherTenantFacilityId = randomUUID();
+    await database.query(
+      `INSERT INTO tenants (tenant_id, name, is_active, created_at, updated_at)
+       VALUES ($1, $1, true, NOW(), NOW())
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenantB],
+    );
     await database.query(
       `INSERT INTO facilities (facility_id, facility_code, facility_name, facility_type, tenant_id, created_at, updated_at)
        VALUES ($1, $2, 'Tenant B Second Facility', 'CHC', $3, NOW(), NOW())`,

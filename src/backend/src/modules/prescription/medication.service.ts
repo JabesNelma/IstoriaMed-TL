@@ -44,8 +44,11 @@ export class MedicationService {
       query.andWhere('medication.is_active = true');
     }
     if (search.q) {
+      // `LOWER(...) LIKE LOWER(...)` is the MySQL/TiDB equivalent of PostgreSQL's
+      // `ILIKE`: the comparison is case insensitive whatever collation the column
+      // was created with.
       query.andWhere(
-        '(medication.name ILIKE :query OR medication.generic_name ILIKE :query)',
+        '(LOWER(medication.name) LIKE LOWER(:query) OR LOWER(medication.generic_name) LIKE LOWER(:query))',
         { query: `%${search.q}%` },
       );
     }

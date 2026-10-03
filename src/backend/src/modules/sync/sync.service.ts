@@ -42,18 +42,22 @@ interface ExecutedEntity {
   entity?: Record<string, unknown>;
 }
 
+/** Unique violation: PostgreSQL `23505`, MySQL/TiDB `ER_DUP_ENTRY` (1062). */
 function isUniqueViolation(error: unknown): boolean {
-  return (
-    error instanceof QueryFailedError &&
-    (error as QueryFailedError & { driverError?: { code?: string } }).driverError?.code === '23505'
-  );
+  const code = driverErrorCode(error);
+  return code === '23505' || code === 'ER_DUP_ENTRY';
 }
 
+/** Missing parent row: PostgreSQL `23503`, MySQL/TiDB `ER_NO_REFERENCED_ROW_2` (1452). */
 function isForeignKeyViolation(error: unknown): boolean {
-  return (
-    error instanceof QueryFailedError &&
-    (error as QueryFailedError & { driverError?: { code?: string } }).driverError?.code === '23503'
-  );
+  const code = driverErrorCode(error);
+  return code === '23503' || code === 'ER_NO_REFERENCED_ROW_2';
+}
+
+function driverErrorCode(error: unknown): string | undefined {
+  if (!(error instanceof QueryFailedError)) return undefined;
+  const code = (error as QueryFailedError & { driverError?: { code?: string | number } }).driverError?.code;
+  return code === undefined ? undefined : String(code);
 }
 
 function errorMessage(error: unknown): string {
@@ -121,18 +125,20 @@ export class SyncService {
   }
 
   /**
-   * Atomically registers the operation. `ON CONFLICT DO NOTHING` is the
-   * database-level race guard: two concurrent replays of the same
-   * operation_id can never both create the claim row.
+   * Atomically registers the operation. The no-op self assignment on a duplicate
+   * primary key is the database-level race guard: two concurrent replays of the
+   * same operation_id can never both create the claim row, and any other failure
+   * (a rejected payload, a bad column value) still surfaces instead of being
+   * silently swallowed the way `INSERT IGNORE` would.
    */
   private async claimOperation(data: SyncRecordDto): Promise<void> {
     const now = new Date();
     await this.syncOperationRepository.query(
       `INSERT INTO sync_operations
          (operation_id, entity_type, entity_id, operation_type, status, retry_count, payload, last_error, created_at, updated_at)
-       VALUES ($1, $2, $3, $4, 'PENDING', 0, $5::jsonb, NULL, $6, $6)
-       ON CONFLICT (operation_id) DO NOTHING`,
-      [data.operation_id, data.entity_type, data.entity_id, data.operation_type, JSON.stringify(data.payload ?? {}), now],
+       VALUES (?, ?, ?, ?, 'PENDING', 0, ?, NULL, ?, ?)
+       ON DUPLICATE KEY UPDATE operation_id = operation_id`,
+      [data.operation_id, data.entity_type, data.entity_id, data.operation_type, JSON.stringify(data.payload ?? {}), now, now],
     );
   }
 

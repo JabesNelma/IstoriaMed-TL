@@ -53,6 +53,14 @@ describe('Offline sync operations (e2e)', () => {
 
   async function createFacility(userId: string, code: string, tenant: string, role: string): Promise<string> {
     const facilityId = randomUUID();
+    // Phase 9: tenant identity is an authoritative row now, so it must exist
+    // before the facility that references it.
+    await database.query(
+      `INSERT INTO tenants (tenant_id, name, is_active, created_at, updated_at)
+       VALUES ($1, $1, true, NOW(), NOW())
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenant],
+    );
     await database.query(
       `INSERT INTO facilities (facility_id, facility_code, facility_name, facility_type, tenant_id, created_at, updated_at)
        VALUES ($1, $2, $3, 'CHC', $4, NOW(), NOW())`,
@@ -142,6 +150,7 @@ describe('Offline sync operations (e2e)', () => {
     await database.query('DELETE FROM staff_profiles');
     await database.query('DELETE FROM facility_memberships');
     await database.query('DELETE FROM facilities');
+    await database.query('DELETE FROM tenants');
     await database.query('DELETE FROM users');
 
     const password = 'sync-password-123';

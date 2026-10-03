@@ -7,6 +7,7 @@ import { IstoriaKlinisModule } from './modules/istoria_klinis/istoria_klinis.mod
 import { AuthModule } from './modules/auth/auth.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { PrescriptionModule } from './modules/prescription/prescription.module';
+import { TenantModule } from './modules/tenant/tenant.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PrescriptionModule } from './modules/prescription/prescription.module';
     AuthModule,
     SyncModule,
     PrescriptionModule,
+    TenantModule,
   ],
   controllers: [AppController],
   providers: [AppService],

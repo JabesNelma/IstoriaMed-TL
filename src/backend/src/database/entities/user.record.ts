@@ -4,7 +4,7 @@ import type { StaffRecord } from './staff.record';
 
 @Entity({ name: 'users' })
 export class UserRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'user_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'user_id' })
   user_id!: string;
 
   @Column({ type: 'varchar', length: 120, unique: true })
@@ -16,10 +16,10 @@ export class UserRecord {
   @Column({ type: 'boolean', default: true })
   is_active!: boolean;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   updated_at!: Date;
 
   @OneToMany('facility_memberships', 'user')

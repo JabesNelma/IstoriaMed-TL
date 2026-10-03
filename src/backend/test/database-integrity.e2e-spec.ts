@@ -19,6 +19,14 @@ describe('Database integrity and multi-facility foundation (e2e)', () => {
 
   async function createFacility(code: string, tenantId: string): Promise<string> {
     const facilityId = randomUUID();
+    // Phase 9: tenant identity is an authoritative row now, so it must exist
+    // before the facility that references it.
+    await database.query(
+      `INSERT INTO tenants (tenant_id, name, is_active, created_at, updated_at)
+       VALUES ($1, $1, true, NOW(), NOW())
+       ON CONFLICT (tenant_id) DO NOTHING`,
+      [tenantId],
+    );
     await database.query(
       `INSERT INTO facilities (facility_id, facility_code, facility_name, facility_type, tenant_id, created_at, updated_at)
        VALUES ($1, $2, $3, 'CHC', $4, NOW(), NOW())`,
@@ -80,7 +88,8 @@ describe('Database integrity and multi-facility foundation (e2e)', () => {
     await app.init();
     database = app.get(DataSource);
     // Phase 8: clinical_visits now RESTRICT staff_profiles, and both RESTRICT
-    // facilities, so children must be cleared before their parents.
+    // facilities, so children must be cleared before their parents. Phase 9:
+    // tenants RESTRICT their facilities too, so they clear last.
     await database.query('DELETE FROM prescription_items');
     await database.query('DELETE FROM prescriptions');
     await database.query('DELETE FROM medications');
@@ -89,10 +98,13 @@ describe('Database integrity and multi-facility foundation (e2e)', () => {
     await database.query('DELETE FROM staff_profiles');
     await database.query('DELETE FROM facility_memberships');
     await database.query('DELETE FROM facilities');
+    await database.query('DELETE FROM tenants');
     await database.query('DELETE FROM users');
   });
 
-  afterEach(async () => app.close());
+  // `?.` keeps a failed bootstrap from masking the real error with an
+  // unrelated "cannot read properties of undefined" from this hook.
+  afterEach(async () => app?.close());
 
   it('lets one tenant own several facilities at the same time', async () => {
     const sharedTenant = tenant();

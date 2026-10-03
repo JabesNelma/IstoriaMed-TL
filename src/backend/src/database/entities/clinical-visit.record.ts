@@ -9,17 +9,17 @@ import { StaffRecord } from './staff.record';
 @Index('idx_clinical_visits_tenant_id', ['tenant_id'])
 @Index('idx_clinical_visits_facility_id', ['facility_id'])
 export class ClinicalVisitRecord {
-  @PrimaryColumn({ type: 'uuid', name: 'visit_id' })
+  @PrimaryColumn({ type: 'char', length: 36, name: 'visit_id' })
   kunjungan_id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'char', length: 36 })
   pasien_id!: string;
 
   @ManyToOne(() => PatientRecord, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'pasien_id', referencedColumnName: 'patient_id' })
   pasien!: PatientRecord;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'char', length: 36, nullable: true })
   facility_id!: string | null;
 
   @ManyToOne(() => FacilityRecord, { nullable: true, onDelete: 'RESTRICT' })
@@ -29,14 +29,14 @@ export class ClinicalVisitRecord {
   @Column({ type: 'varchar', length: 100 })
   tenant_id!: string;
 
-  @Column({ type: 'uuid', nullable: true })
+  @Column({ type: 'char', length: 36, nullable: true })
   staf_id!: string | null;
 
   @ManyToOne(() => StaffRecord, { nullable: true, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'staf_id', referencedColumnName: 'staff_id' })
   staf!: StaffRecord | null;
 
-  @Column({ type: 'timestamptz', name: 'visit_date' })
+  @Column({ type: 'datetime', name: 'visit_date' })
   tanggal_kunjungan!: Date;
 
   @Column({ type: 'text' })
@@ -60,9 +60,9 @@ export class ClinicalVisitRecord {
   @Column({ type: 'varchar', length: 20, default: 'Pending' })
   status_sinkronisasi!: 'Pending' | 'Synced' | 'Failed';
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   created_at!: Date;
 
-  @Column({ type: 'timestamptz' })
+  @Column({ type: 'datetime' })
   updated_at!: Date;
 }
