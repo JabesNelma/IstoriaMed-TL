@@ -26,7 +26,9 @@ class IstoriaRepository {
         }
       });
     } on ApiException catch (error) {
-      if (!error.isNetworkFailure) rethrow;
+      // Network failure or 404 (patient not yet known to the server, e.g.
+      // locally created / demo records) both fall back to the local store.
+      if (!error.isNetworkFailure && error.statusCode != 404) rethrow;
     }
 
     final local = (await isar.istoriaKlinis.where().findAll())

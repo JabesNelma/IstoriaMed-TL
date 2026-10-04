@@ -4,8 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/sync/sync_service.dart';
 import '../../logic/auth_bloc/auth_bloc.dart';
 import '../../data/session/auth_session.dart';
-import '../screens/istoria_klinis_screen.dart';
-import '../screens/register_pasien_screen.dart';
+import '../screens/pasien_list_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_button.dart';
 import '../widgets/app_card.dart';
@@ -33,9 +32,12 @@ class _StaffShellState extends State<StaffShell> {
         body: IndexedStack(
           index: _index,
           children: [
-            _StaffHome(session: session),
-            const RegisterPasienScreen(),
-            const IstoriaKlinisScreen(),
+            _StaffHome(
+              session: session,
+              onOpenTab: (index) => setState(() => _index = index),
+            ),
+            const PasienListScreen(),
+            const _KunjunganPlaceholder(),
             const _SyncTab(),
             const _ProfileTab(),
           ],
@@ -59,9 +61,10 @@ class _StaffShellState extends State<StaffShell> {
 }
 
 class _StaffHome extends StatelessWidget {
-  const _StaffHome({required this.session});
+  const _StaffHome({required this.session, required this.onOpenTab});
 
   final AuthSession? session;
+  final void Function(int) onOpenTab;
 
   @override
   Widget build(BuildContext context) {
@@ -78,15 +81,15 @@ class _StaffHome extends StatelessWidget {
         AppMenuItem(
           icon: Icons.person_add_alt_1,
           title: 'Pasien',
-          subtitle: 'Rejistu pasiente foun',
-          onTap: () {},
+          subtitle: 'Rejistu no buka pasiente',
+          onTap: () => onOpenTab(1),
         ),
         const SizedBox(height: AppSpacing.md),
         AppMenuItem(
           icon: Icons.description_outlined,
           title: 'Kunjungan',
           subtitle: 'Istoria klinis pasiente',
-          onTap: () {},
+          onTap: () => onOpenTab(2),
         ),
         const SizedBox(height: AppSpacing.md),
         const AppMenuItem(
@@ -101,6 +104,39 @@ class _StaffHome extends StatelessWidget {
           title: 'Sinkronisasi',
           subtitle: 'Lakoi sinkroniza dadus pendentes',
           onTap: () {},
+        ),
+      ],
+    );
+  }
+}
+
+/// Kunjungan tab. There is no agreed global clinical workflow yet, so this
+/// stays an explicit placeholder: visits are always opened from a patient
+/// profile (Pasien -> patient -> Kunjungan Foun / Riwayat Kunjungan).
+class _KunjunganPlaceholder extends StatelessWidget {
+  const _KunjunganPlaceholder();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(AppSpacing.lg),
+      children: [
+        Text('Kunjungan', style: AppTextStyles.appTitle),
+        const SizedBox(height: AppSpacing.md),
+        const AppCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Istoria klinis pasiente', style: AppTextStyles.sectionTitle),
+              SizedBox(height: AppSpacing.sm),
+              Text(
+                'Kunjungan sempre mosu husi profil pasiente. Tama iha tab '
+                '"Pasien", hili pasiente ida, depois "Kunjungan Foun" ka '
+                '"Riwayat Kunjungan".',
+                style: AppTextStyles.body,
+              ),
+            ],
+          ),
         ),
       ],
     );

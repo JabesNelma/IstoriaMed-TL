@@ -6,7 +6,11 @@ import '../../logic/pasien_bloc/pasien_bloc.dart';
 import '../../logic/pasien_bloc/pasien_event.dart';
 import '../../logic/pasien_bloc/pasien_state.dart';
 import '../widgets/status_indicator.dart';
+import 'pasien_profile_screen.dart';
 
+/// Patient registration form. Opened from the patient list (+); after a
+/// successful local save it replaces itself with the new patient's profile,
+/// so back from the profile returns straight to the list.
 class RegisterPasienScreen extends StatefulWidget {
   const RegisterPasienScreen({super.key});
 
@@ -92,6 +96,11 @@ class _RegisterPasienScreenState extends State<RegisterPasienScreen> {
                   : 'Dados rai hela lokal. Sinkroniza bainhira koneksaun fila.'),
             ),
           );
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute<void>(
+              builder: (_) => PasienProfileScreen(pasien: state.pasien),
+            ),
+          );
         }
         if (state is PasienError) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -101,9 +110,11 @@ class _RegisterPasienScreenState extends State<RegisterPasienScreen> {
       },
       builder: (context, state) {
         final loading = state is PasienLoading;
-        return Form(
-          key: _formKey,
-          child: ListView(
+        return Scaffold(
+          appBar: AppBar(title: const Text('Rejistu Pasiente Foun')),
+          body: Form(
+            key: _formKey,
+            child: ListView(
             padding: const EdgeInsets.all(20),
             children: [
               Text('Rejistu Pasiente Foun', style: Theme.of(context).textTheme.headlineSmall),
@@ -174,6 +185,7 @@ class _RegisterPasienScreenState extends State<RegisterPasienScreen> {
                 child: const Text('Sinkroniza Dadus Pendentes'),
               ),
             ],
+          ),
           ),
         );
       },

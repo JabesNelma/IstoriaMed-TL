@@ -11,12 +11,12 @@ void main() {
       MaterialApp(
         home: BlocProvider(
           create: (_) => PasienBloc.testing(),
-          child: const Scaffold(body: RegisterPasienScreen()),
+          child: const RegisterPasienScreen(),
         ),
       ),
     );
 
-    expect(find.text('Rejistu Pasiente Foun'), findsOneWidget);
+    expect(find.text('Rejistu Pasiente Foun'), findsNWidgets(2));
     expect(find.text('Numeru KTP'), findsOneWidget);
     expect(find.text('Scan Fingerprint (Simulasaun)'), findsOneWidget);
   });

@@ -5,6 +5,25 @@ import '../data/local/pasien_schema.dart';
 import '../data/remote/api_client.dart';
 import '../data/remote/api_exception.dart';
 
+/// Thrown when a patient with the same KTP number already exists locally.
+/// Duplicate protection against the server catalogue remains a backend
+/// responsibility; this only guards the local store.
+class DuplicatePasienException implements Exception {
+  const DuplicatePasienException(this.noKtp);
+
+  final String noKtp;
+}
+
+/// LOCAL/MOCK PLACEHOLDER — not an official national MRN.
+///
+/// The server owns the authoritative medical record number (it is never part
+/// of the sync payload). This generator only gives locally created patients a
+/// readable display identifier until the first successful synchronization
+/// assigns the real one. Kept behind a single function so backend integration
+/// can replace or drop it without touching the UI.
+String nextLocalMrn() =>
+    'MRN-LOCAL-${DateTime.now().microsecondsSinceEpoch.toRadixString(36).toUpperCase()}';
+
 class PasienRepository {
   PasienRepository({required this.isar, required this.apiClient});
 
@@ -14,7 +33,18 @@ class PasienRepository {
   /// Offline-first create: the patient and its queue entry are written in one
   /// Isar transaction. The same queue then synchronizes it whether the device
   /// is online or offline, so there is only one code path.
-  Future<Pasien> register(Pasien pasien) => SyncQueue.enqueuePatient(isar, pasien);
+  Future<Pasien> register(Pasien pasien) async {
+    final ktp = pasien.noKtp?.trim() ?? '';
+    if (ktp.isNotEmpty) {
+      final duplicate = await isar.pasiens
+          .filter()
+          .noKtpEqualTo(ktp)
+          .findFirst();
+      if (duplicate != null) throw DuplicatePasienException(ktp);
+    }
+    pasien.medicalRecordNumber ??= nextLocalMrn();
+    return SyncQueue.enqueuePatient(isar, pasien);
+  }
 
   Future<List<Pasien>> findAll({String? query}) async {
     final patients = await isar.pasiens.where().findAll();

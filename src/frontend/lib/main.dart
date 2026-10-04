@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import 'app.dart';
 import 'core/sync/sync_service.dart';
+import 'data/local/demo_seed.dart';
 import 'data/local/local_database.dart';
 import 'data/remote/api_client.dart';
 import 'data/session/session_store.dart';
@@ -12,6 +13,8 @@ import 'repositories/auth_repository.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final isar = await LocalDatabase.open();
+  // Dev-only demo catalogue (gated by kDemoMode, skipped when data exists).
+  await seedDemoDataIfEmpty(isar);
   final apiClient = ApiClient();
   final authRepository = ApiClientAuthRepository(apiClient, SessionStore(isar));
   final syncService = SyncService(isar: isar, apiClient: apiClient);

@@ -17,6 +17,16 @@ final class PasienLoading extends PasienState {
   const PasienLoading();
 }
 
+final class PasienListLoaded extends PasienState {
+  const PasienListLoaded(this.pasiens, {this.query = ''});
+
+  final List<Pasien> pasiens;
+  final String query;
+
+  @override
+  List<Object?> get props => [pasiens, query];
+}
+
 final class PasienSuccess extends PasienState {
   const PasienSuccess(this.pasien);
 
