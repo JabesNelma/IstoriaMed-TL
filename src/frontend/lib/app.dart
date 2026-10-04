@@ -7,6 +7,8 @@ import 'data/remote/api_client.dart';
 import 'logic/auth_bloc/auth_bloc.dart';
 import 'logic/istoria_bloc/istoria_bloc.dart';
 import 'logic/pasien_bloc/pasien_bloc.dart';
+import 'logic/prescription_bloc/prescription_bloc.dart';
+import 'logic/sync_bloc/sync_bloc.dart';
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/splash_screen.dart';
 import 'presentation/screens/unsupported_role_screen.dart';
@@ -16,6 +18,7 @@ import 'presentation/theme/app_theme.dart';
 import 'repositories/auth_repository.dart';
 import 'repositories/istoria_repository.dart';
 import 'repositories/pasien_repository.dart';
+import 'repositories/prescription_repository.dart';
 
 /// Composition root: wires the existing repositories/blocs plus the new
 /// session stack into one widget tree. Used by main() and by the tests.
@@ -26,11 +29,14 @@ Widget buildIstoriaMedApp({
 }) {
   final pasienRepository = PasienRepository(isar: isar, apiClient: apiClient);
   final istoriaRepository = IstoriaRepository(isar: isar, apiClient: apiClient);
+  final prescriptionRepository =
+      PrescriptionRepository(isar: isar, apiClient: apiClient);
   final syncService = SyncService(isar: isar, apiClient: apiClient);
   return MultiRepositoryProvider(
     providers: [
       RepositoryProvider.value(value: pasienRepository),
       RepositoryProvider.value(value: istoriaRepository),
+      RepositoryProvider.value(value: prescriptionRepository),
       RepositoryProvider.value(value: syncService),
     ],
     child: MultiBlocProvider(
@@ -46,6 +52,13 @@ Widget buildIstoriaMedApp({
         BlocProvider(
           create: (_) =>
               IstoriaBloc(istoriaRepository, syncService),
+        ),
+        BlocProvider(
+          create: (_) =>
+              PrescriptionBloc(prescriptionRepository, syncService),
+        ),
+        BlocProvider(
+          create: (_) => SyncBloc(isar, syncService),
         ),
       ],
       child: const IstoriaMedApp(),

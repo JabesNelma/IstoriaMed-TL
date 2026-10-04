@@ -3,14 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../data/local/istoria_schema.dart';
 import '../../data/local/pasien_schema.dart';
+import '../../data/local/prescription_schema.dart';
 import '../../logic/istoria_bloc/istoria_bloc.dart';
 import '../../logic/istoria_bloc/istoria_event.dart';
 import '../../logic/istoria_bloc/istoria_state.dart';
+import '../../logic/prescription_bloc/prescription_bloc.dart';
+import '../../logic/prescription_bloc/prescription_event.dart';
+import '../../logic/prescription_bloc/prescription_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_button.dart';
 import '../widgets/app_card.dart';
 import '../widgets/status_indicator.dart';
 import 'istoria_klinis_screen.dart';
+import 'prescription_detail_screen.dart';
+import 'prescription_list_screen.dart';
 import 'visit_detail_screen.dart';
 import 'visit_history_screen.dart';
 
@@ -36,10 +42,17 @@ class _PasienProfileScreenState extends State<PasienProfileScreen> {
     // key the sync queue and the backend use).
     _patientKey = widget.pasien.remoteId ?? widget.pasien.id.toString();
     context.read<IstoriaBloc>().add(FetchPasienHistory(_patientKey));
+    context
+        .read<PrescriptionBloc>()
+        .add(LoadPatientPrescriptions(_patientKey));
   }
 
-  void _reload() =>
-      context.read<IstoriaBloc>().add(FetchPasienHistory(_patientKey));
+  void _reload() {
+    context.read<IstoriaBloc>().add(FetchPasienHistory(_patientKey));
+    context
+        .read<PrescriptionBloc>()
+        .add(LoadPatientPrescriptions(_patientKey));
+  }
 
   Future<void> _newVisit() async {
     await Navigator.of(context).push(
@@ -136,17 +149,20 @@ class _PasienProfileScreenState extends State<PasienProfileScreen> {
             ),
           ),
           const SizedBox(height: AppSpacing.md),
-          AppCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Resep / Aimoruk', style: AppTextStyles.sectionTitle),
-                const SizedBox(height: AppSpacing.sm),
-                const Text(
-                  'Seidauk iha data rese. (Fase tuak mai.)',
-                  style: AppTextStyles.caption,
+          _PrescriptionSection(
+            patientKey: _patientKey,
+            onOpenList: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => PrescriptionListScreen(pasien: pasien),
+              ),
+            ),
+            onOpenPrescription: (record) => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => PrescriptionDetailScreen(
+                  prescription: record,
+                  pasien: pasien,
                 ),
-              ],
+              ),
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
@@ -268,6 +284,96 @@ class _VisitSection extends StatelessWidget {
 
   String _visitDate(IstoriaKlinis record) {
     final date = record.tanggalKunjungan;
+    if (date == null) return 'Data la iha';
+    return '${date.day.toString().padLeft(2, '0')}/'
+        '${date.month.toString().padLeft(2, '0')}/'
+        '${date.year}';
+  }
+}
+
+/// Resep & Obat section: local prescriptions preview (max 3) with a link to
+/// the full list. Data comes from the PrescriptionBloc over the local store.
+class _PrescriptionSection extends StatelessWidget {
+  const _PrescriptionSection({
+    required this.patientKey,
+    required this.onOpenList,
+    required this.onOpenPrescription,
+  });
+
+  final String patientKey;
+  final VoidCallback onOpenList;
+  final void Function(Prescription) onOpenPrescription;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Resep / Aimoruk', style: AppTextStyles.sectionTitle),
+              TextButton(onPressed: onOpenList, child: const Text('Haree hotu')),
+            ],
+          ),
+          BlocBuilder<PrescriptionBloc, PrescriptionState>(
+            buildWhen: (previous, current) =>
+                current is PrescriptionListLoaded ||
+                current is PrescriptionLoading ||
+                current is PrescriptionError,
+            builder: (context, state) {
+              if (state is PrescriptionLoading) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (state is PrescriptionError) {
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  child: Text(state.message, style: AppTextStyles.error),
+                );
+              }
+              final prescriptions = state is PrescriptionListLoaded
+                  ? state.prescriptions
+                  : const <Prescription>[];
+              if (prescriptions.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                  child: Text('Seidauk iha rese.',
+                      style: AppTextStyles.caption),
+                );
+              }
+              final preview = prescriptions.take(3).toList();
+              return Column(
+                children: [
+                  for (final prescription in preview)
+                    ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: const Icon(Icons.medication_outlined,
+                          color: AppColors.primary),
+                      title: Text(
+                        '${prescription.items.length} aimoruk',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text(_prescriptionDate(prescription)),
+                      trailing: const Icon(Icons.chevron_right,
+                          color: AppColors.muted),
+                      onTap: () => onOpenPrescription(prescription),
+                    ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _prescriptionDate(Prescription prescription) {
+    final date = prescription.prescribedAt;
     if (date == null) return 'Data la iha';
     return '${date.day.toString().padLeft(2, '0')}/'
         '${date.month.toString().padLeft(2, '0')}/'

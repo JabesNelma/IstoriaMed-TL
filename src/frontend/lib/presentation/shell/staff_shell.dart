@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/sync/sync_service.dart';
 import '../../logic/auth_bloc/auth_bloc.dart';
 import '../../data/session/auth_session.dart';
 import '../screens/pasien_list_screen.dart';
+import '../screens/sync_center_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_button.dart';
 import '../widgets/app_card.dart';
@@ -38,7 +38,7 @@ class _StaffShellState extends State<StaffShell> {
             ),
             const PasienListScreen(),
             const _KunjunganPlaceholder(),
-            const _SyncTab(),
+            const SyncCenterScreen(),
             const _ProfileTab(),
           ],
         ),
@@ -92,18 +92,20 @@ class _StaffHome extends StatelessWidget {
           onTap: () => onOpenTab(2),
         ),
         const SizedBox(height: AppSpacing.md),
-        const AppMenuItem(
+        // Prescriptions always live in the patient context (Pasien -> patient
+        // -> Resep & Aimoruk), so this menu leads to the patient list.
+        AppMenuItem(
           icon: Icons.medication_outlined,
           title: 'Resep',
-          subtitle: 'Seidauk disponivel iha APK',
-          enabled: false,
+          subtitle: 'Rese sempre mosu husi profil pasiente',
+          onTap: () => onOpenTab(1),
         ),
         const SizedBox(height: AppSpacing.md),
         AppMenuItem(
           icon: Icons.sync_outlined,
           title: 'Sinkronisasi',
-          subtitle: 'Lakoi sinkroniza dadus pendentes',
-          onTap: () {},
+          subtitle: 'Haree dadus pendentes no sinkroniza',
+          onTap: () => onOpenTab(3),
         ),
       ],
     );
@@ -137,43 +139,6 @@ class _KunjunganPlaceholder extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ],
-    );
-  }
-}
-
-/// Sync tab built on the existing SyncService — no new sync logic.
-class _SyncTab extends StatelessWidget {
-  const _SyncTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      children: [
-        Text('Sinkronizasaun', style: AppTextStyles.sectionTitle),
-        const SizedBox(height: AppSpacing.sm),
-        const Text(
-          'Dadus nebe rai lokal sei haruka ba servidor bainhira button esteem. '
-          'Aplikasaun mós tenta sinkroniza bainhira loke fali.',
-          style: AppTextStyles.body,
-        ),
-        const SizedBox(height: AppSpacing.lg),
-        AppButton(
-          label: 'Sinkroniza Dadus Pendentes',
-          icon: Icons.sync,
-          onPressed: () async {
-            final report = await context.read<SyncService>().syncPending();
-            if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                    'Sinkronizasaun remata: ${report.synced} susesu, '
-                    '${report.pending} sei hela, ${report.failed} falha.'),
-              ),
-            );
-          },
         ),
       ],
     );

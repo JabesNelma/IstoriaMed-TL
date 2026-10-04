@@ -146,6 +146,53 @@ abstract final class SyncQueue {
     return operations.where((operation) => operation.status == SyncStatus.pending).toList();
   }
 
+  /// Reads the whole queue (every status) in deterministic oldest-first order.
+  /// Used by the Sync Center to display pending and failed operations.
+  static Future<List<SyncOperation>> loadAll(Isar isar) async {
+    final operations = await isar.syncOperations.where().findAll();
+    operations.sort((a, b) {
+      final byCreatedAt = a.createdAt.compareTo(b.createdAt);
+      return byCreatedAt != 0 ? byCreatedAt : a.id.compareTo(b.id);
+    });
+    return operations;
+  }
+
+  /// Returns a FAILED operation to the PENDING state so the next
+  /// [SyncService.syncPending] run retries it. The operation identity
+  /// (operationId/entityId) is never regenerated, so the server idempotency
+  /// key stays stable and no duplicate record can be created.
+  static Future<void> requeueFailed(Isar isar, String operationId) async {
+    final operation = await findByOperationId(isar, operationId);
+    if (operation == null || operation.status != SyncStatus.failed) return;
+    await isar.writeTxn(() async {
+      operation.status = SyncStatus.pending;
+      operation.nextAttemptAt = null;
+      operation.updatedAt = DateTime.now();
+      await isar.syncOperations.put(operation);
+      // The entity itself becomes Pending again so its detail status matches.
+      switch (operation.entityType) {
+        case SyncEntityType.patient:
+          final patient = await isar.pasiens.get(operation.localEntityId);
+          if (patient != null) {
+            patient.localStatus = SyncLocalStatus.pending;
+            await isar.pasiens.put(patient);
+          }
+        case SyncEntityType.clinicalVisit:
+          final visit = await isar.istoriaKlinis.get(operation.localEntityId);
+          if (visit != null) {
+            visit.syncStatus = SyncLocalStatus.pending;
+            await isar.istoriaKlinis.put(visit);
+          }
+        case SyncEntityType.prescription:
+          final prescription = await isar.prescriptions.get(operation.localEntityId);
+          if (prescription != null) {
+            prescription.syncStatus = SyncLocalStatus.pending;
+            await isar.prescriptions.put(prescription);
+          }
+      }
+    });
+  }
+
   static Future<SyncOperation?> findByOperationId(Isar isar, String operationId) {
     return isar.syncOperations.filter().operationIdEqualTo(operationId).findFirst();
   }

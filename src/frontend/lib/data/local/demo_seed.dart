@@ -2,7 +2,9 @@ import 'package:isar/isar.dart';
 
 import '../session/demo_mode.dart';
 import 'istoria_schema.dart';
+import 'medication.dart';
 import 'pasien_schema.dart';
+import 'prescription_schema.dart';
 
 /// DEVELOPMENT/TEST DATA — clearly synthetic, never real patient records.
 ///
@@ -86,5 +88,55 @@ Future<void> seedDemoDataIfEmpty(Isar isar) async {
   await isar.writeTxn(() async {
     await isar.pasiens.putAll(patients);
     await isar.istoriaKlinis.putAll(visits);
+    await isar.prescriptions.putAll(demoPrescriptions);
   });
 }
+
+/// Synthetic medication catalogue for demo mode only. The real catalog is
+/// server owned reference data read through PrescriptionRepository.medications;
+/// this list only keeps the prescription flow reviewable without a backend.
+const List<Medication> demoMedications = <Medication>[
+  Medication(
+    medicationId: 'demo-med-1',
+    name: 'Paracetamol',
+    genericName: 'Paracetamol',
+    form: 'TABLET',
+    strength: '500 mg',
+    unit: 'TABLET',
+  ),
+  Medication(
+    medicationId: 'demo-med-2',
+    name: 'Amoxicillin',
+    genericName: 'Amoxicillin',
+    form: 'KAPSUL',
+    strength: '500 mg',
+    unit: 'KAPSUL',
+  ),
+  Medication(
+    medicationId: 'demo-med-3',
+    name: 'Amlodipine',
+    genericName: 'Amlodipine',
+    form: 'TABLET',
+    strength: '5 mg',
+    unit: 'TABLET',
+  ),
+];
+
+/// Synthetic demo prescriptions (never queued for synchronization).
+final List<Prescription> demoPrescriptions = <Prescription>[
+  Prescription()
+    ..remoteId = 'demo-rese-1'
+    ..visitId = 'demo-kunjungan-2'
+    ..prescribedAt = DateTime(2026, 10, 2, 15, 0)
+    ..syncStatus = 'Pending'
+    ..items = <PrescriptionItem>[
+      PrescriptionItem()
+        ..medicationId = 'demo-med-1'
+        ..medicationName = 'Paracetamol'
+        ..medicationStrength = '500 mg'
+        ..dose = '1 tablet'
+        ..frequency = '3x loron'
+        ..duration = '5 loron'
+        ..quantity = 15,
+    ],
+];

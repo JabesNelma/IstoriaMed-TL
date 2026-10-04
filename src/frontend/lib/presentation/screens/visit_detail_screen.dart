@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../data/local/istoria_schema.dart';
 import '../../data/local/pasien_schema.dart';
 import '../theme/app_theme.dart';
+import '../widgets/app_button.dart';
 import '../widgets/app_card.dart';
 import '../widgets/status_indicator.dart';
+import 'prescription_form_screen.dart';
 
 /// Read-only clinical visit detail: SOAP + ICD-10 for one visit of one
 /// patient. Data comes straight from the record the caller already holds
@@ -70,6 +72,19 @@ class VisitDetailScreen extends StatelessWidget {
                 const SizedBox(height: AppSpacing.sm),
                 Text('ICD-10: ${record.kodeIcd10}', style: AppTextStyles.body),
               ],
+            ),
+          ),
+          const SizedBox(height: AppSpacing.lg),
+          AppButton(
+            label: 'Kria Rese',
+            icon: Icons.medication_outlined,
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => PrescriptionFormScreen(
+                  pasien: pasien,
+                  visit: record,
+                ),
+              ),
             ),
           ),
         ],

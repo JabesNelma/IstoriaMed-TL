@@ -1,6 +1,7 @@
 import 'package:isar/isar.dart';
 
 import '../core/sync/sync_queue.dart';
+import '../data/local/istoria_schema.dart';
 import '../data/local/medication.dart';
 import '../data/local/prescription_schema.dart';
 import '../data/remote/api_client.dart';
@@ -66,6 +67,27 @@ class PrescriptionRepository {
         // Stable tiebreaker so a locally queued prescription without a
         // prescription time still has a deterministic position.
         return byTime != 0 ? byTime : (a.remoteId ?? '').compareTo(b.remoteId ?? '');
+      });
+    return local;
+  }
+
+  /// Prescriptions for one patient, resolved through the local visit
+  /// relationship (Patient -> ClinicalVisit -> Prescription). Pure local read:
+  /// the profile section never needs a network round trip to render.
+  Future<List<Prescription>> forPatient(String patientId) async {
+    final visitIds = (await isar.istoriaKlinis.where().findAll())
+        .where((visit) => visit.pasienId == patientId)
+        .map((visit) => visit.remoteId ?? visit.id.toString())
+        .toSet();
+    final local = (await isar.prescriptions.where().findAll())
+        .where((record) => visitIds.contains(record.visitId))
+        .toList()
+      ..sort((a, b) {
+        final byTime = (b.prescribedAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+            .compareTo(a.prescribedAt ?? DateTime.fromMillisecondsSinceEpoch(0));
+        return byTime != 0
+            ? byTime
+            : (b.remoteId ?? '').compareTo(a.remoteId ?? '');
       });
     return local;
   }
