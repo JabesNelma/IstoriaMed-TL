@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../data/session/auth_session.dart';
 import '../../repositories/auth_repository.dart';
 
+/// The shells a demo (preview) session may enter.
+enum DemoRoleGroup { staff, patient }
+
 /// Session state machine for the whole app.
 ///
 /// UNKNOWN          — bootstrap still reading the local store.
@@ -14,6 +17,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthBootstrapRequested>(_bootstrap);
     on<AuthLoginSubmitted>(_login);
     on<AuthLogoutRequested>(_logout);
+    on<AuthDemoLoginRequested>(_demoLogin);
   }
 
   final AuthRepository _repository;
@@ -51,6 +55,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await _repository.logout();
     emit(const AuthUnauthenticated());
   }
+
+  /// UI/UX preview path (kDemoMode): emits an authenticated state with a
+  /// synthetic session. No repository call, nothing saved, nothing sent —
+  /// logging out afterwards simply returns to the login screen.
+  Future<void> _demoLogin(
+    AuthDemoLoginRequested event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(
+      AuthAuthenticated(
+        AuthSession.demo(
+          role: event.roleGroup == DemoRoleGroup.patient ? 'PATIENT' : 'DOCTOR',
+        ),
+      ),
+    );
+  }
 }
 
 sealed class AuthEvent {
@@ -70,6 +90,13 @@ class AuthLoginSubmitted extends AuthEvent {
 
 class AuthLogoutRequested extends AuthEvent {
   const AuthLogoutRequested();
+}
+
+/// Dev-preview only (kDemoMode): enter a shell without credentials.
+class AuthDemoLoginRequested extends AuthEvent {
+  const AuthDemoLoginRequested(this.roleGroup);
+
+  final DemoRoleGroup roleGroup;
 }
 
 sealed class AuthState extends Equatable {

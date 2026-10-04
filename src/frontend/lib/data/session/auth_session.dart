@@ -99,6 +99,18 @@ class AuthSession {
     );
   }
 
+  /// Dev-preview only session (kDemoMode). Never persisted, never sent to the
+  /// backend; exists so the UI/UX can be reviewed without login credentials.
+  factory AuthSession.demo({required String role, String facilityId = 'demo-fasilitas'}) =>
+      AuthSession(
+        accessToken: 'demo-preview-token',
+        userId: 'demo-user',
+        loginIdentifier: 'demo@$facilityId',
+        memberships: [
+          AppMembership(facilityId: facilityId, tenantId: 'demo-tenant', role: role),
+        ],
+      );
+
   AppSession toStore() => AppSession()
     ..accessToken = accessToken
     ..userId = userId

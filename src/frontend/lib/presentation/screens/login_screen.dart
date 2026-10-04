@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../data/session/demo_mode.dart';
 import '../../logic/auth_bloc/auth_bloc.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_button.dart';
@@ -130,6 +131,31 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                         child: const Text('Lupa password?'),
                       ),
+                      if (kDemoMode) ...[
+                        const SizedBox(height: AppSpacing.xl),
+                        Text('MODE PREVIEW (DEV) — la uza login',
+                            style: AppTextStyles.caption),
+                        const SizedBox(height: AppSpacing.sm),
+                        OutlinedButton.icon(
+                          onPressed: loading
+                              ? null
+                              : () => context.read<AuthBloc>().add(
+                                  const AuthDemoLoginRequested(
+                                      DemoRoleGroup.staff)),
+                          icon: const Icon(Icons.medical_services_outlined),
+                          label: const Text('Lihat UI Staf'),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        OutlinedButton.icon(
+                          onPressed: loading
+                              ? null
+                              : () => context.read<AuthBloc>().add(
+                                  const AuthDemoLoginRequested(
+                                      DemoRoleGroup.patient)),
+                          icon: const Icon(Icons.person_outline),
+                          label: const Text('Lihat UI Pasien'),
+                        ),
+                      ],
                     ],
                   ),
                 ),

@@ -182,4 +182,27 @@ void main() {
     expect(find.text('Parsing rola la suportadu'), findsOneWidget);
     expect(find.text('Selamat datang,'), findsNothing);
   });
+
+  testWidgets('Case 7 (kDemoMode): preview buttons enter staff and patient shells '
+      'without credentials', (tester) async {
+    await pumpApp(tester, FakeAuthRepository(restoredSession: null));
+
+    await tester.tap(find.text('Lihat UI Staf'));
+    await tester.pumpAndSettle();
+    expect(find.text('Selamat datang,'), findsOneWidget);
+    expect(find.text('Fasilitas: demo-fasilitas'), findsOneWidget);
+
+    // Demo logout returns to login (nothing was persisted).
+    await tester.tap(find.text('Profil'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Logout'));
+    await tester.pumpAndSettle();
+    expect(find.text('LOGIN'), findsOneWidget);
+
+    await tester.ensureVisible(find.text('Lihat UI Pasien'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Lihat UI Pasien'));
+    await tester.pumpAndSettle();
+    expect(find.text('Riwayat Medis'), findsWidgets);
+  });
 }

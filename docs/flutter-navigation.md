@@ -60,6 +60,17 @@ tidak bisa kembali ke halaman terautentikasi.
   Semua halaman placeholder eksplisit — backend belum menerbitkan role PATIENT,
   jadi shell ini belum terjangkau lewat login nyata; routing-nya siap untuk nanti.
 
+## Mode Preview (DEV ONLY)
+
+`lib/data/session/demo_mode.dart` memuat `kDemoMode = true` (dev-only). Saat aktif,
+halaman login menampilkan dua tombol di bagian bawah: **"Lihat UI Staf"** dan
+**"Lihat UI Pasien"**. Tombol ini masuk ke shell masing-masing memakai sesi sintetis
+(`AuthSession.demo()`): tidak memanggil backend, tidak menyimpan apa pun ke Isar,
+logout hanya kembali ke login. Set `kDemoMode = false` (atau hapus branch demo di
+`LoginScreen`/`AuthBloc`) sebelum deployment nyata. Catatan: dalam mode preview,
+panggilan data nyata (mis. registrasi pasien) tetap akan ditolak backend karena
+tidak membawa token — yang bisa dinilai hanya tampilan, navigasi, dan state UI.
+
 ## Yang BELUM dibuat (jangan dianggap selesai)
 
 - Patient search UI, patient profile, prescription UI.
