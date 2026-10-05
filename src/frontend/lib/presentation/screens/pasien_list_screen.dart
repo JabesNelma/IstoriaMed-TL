@@ -7,6 +7,7 @@ import '../../logic/pasien_bloc/pasien_event.dart';
 import '../../logic/pasien_bloc/pasien_state.dart';
 import '../theme/app_theme.dart';
 import '../widgets/app_card.dart';
+import '../widgets/status_indicator.dart';
 import 'pasien_profile_screen.dart';
 import 'register_pasien_screen.dart';
 
@@ -88,9 +89,19 @@ class _PasienListScreenState extends State<PasienListScreen> {
                   controller: _searchController,
                   onChanged: _search,
                   textInputAction: TextInputAction.search,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Buka pasiente (naran, MRN, KTP)...',
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isEmpty
+                        ? null
+                        : IconButton(
+                            tooltip: 'Hamoos buka',
+                            icon: const Icon(Icons.clear),
+                            onPressed: () {
+                              _searchController.clear();
+                              _search('');
+                            },
+                          ),
                   ),
                 ),
                 const SizedBox(height: AppSpacing.md),
@@ -199,6 +210,7 @@ class _PatientCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                StatusIndicator(status: pasien.localStatus),
                 Text(
                   'Moris: $_birthDate  |  $gender',
                   style: AppTextStyles.caption,

@@ -52,10 +52,11 @@ tidak bisa kembali ke halaman terautentikasi.
 
 ## Shell
 
-- **StaffShell** (`/staff`): bottom nav Beranda | Pasien | Kunjungan | Sync | Profil.
-  Tab Pasien = `RegisterPasienScreen` existing; tab Kunjungan = `IstoriaKlinisScreen`
-  existing; Sync memakai `SyncService.syncPending()` existing. Menu Resep masih
-  placeholder (belum ada UI resep).
+- **StaffShell** (`/staff`): bottom nav Beranda | Pasien | Sync | Profil (4 tab).
+  Kunjungan dan resep tidak punya tab sendiri — keduanya selalu dibuka dari
+  konteks pasien (Pasien -> Profil Pasien -> Kunjungan Foun / Riwayat Kunjungan
+  -> Detalhu Kunjungan -> Rese Foun), sehingga tidak ada menu untuk fitur yang
+  tidak berdiri sendiri. Sync memakai `SyncService.syncPending()` existing.
 - **PatientShell** (`/patient`): bottom nav Beranda | Riwayat | Resep | Profil.
   Semua halaman placeholder eksplisit — backend belum menerbitkan role PATIENT,
   jadi shell ini belum terjangkau lewat login nyata; routing-nya siap untuk nanti.
@@ -73,7 +74,6 @@ tidak membawa token — yang bisa dinilai hanya tampilan, navigasi, dan state UI
 
 ## Yang BELUM dibuat (jangan dianggap selesai)
 
-- Patient search UI, patient profile, prescription UI.
 - Validasi token ke server saat splash (splash hanya membaca session lokal; token
   expired 15 menit baru terasa saat request API ditolak — belum ada re-auth flow).
 - Pembatasan menu per role di dalam staff shell (semua role staf melihat shell sama).

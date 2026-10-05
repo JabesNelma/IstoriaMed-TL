@@ -37,7 +37,6 @@ class _StaffShellState extends State<StaffShell> {
               onOpenTab: (index) => setState(() => _index = index),
             ),
             const PasienListScreen(),
-            const _KunjunganPlaceholder(),
             const SyncCenterScreen(),
             const _ProfileTab(),
           ],
@@ -48,8 +47,6 @@ class _StaffShellState extends State<StaffShell> {
           destinations: const [
             NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Beranda'),
             NavigationDestination(icon: Icon(Icons.person_add_alt_1), label: 'Pasien'),
-            NavigationDestination(
-                icon: Icon(Icons.description_outlined), label: 'Kunjungan'),
             NavigationDestination(
                 icon: Icon(Icons.sync_outlined), label: 'Sync'),
             NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profil'),
@@ -85,60 +82,13 @@ class _StaffHome extends StatelessWidget {
           onTap: () => onOpenTab(1),
         ),
         const SizedBox(height: AppSpacing.md),
-        AppMenuItem(
-          icon: Icons.description_outlined,
-          title: 'Kunjungan',
-          subtitle: 'Istoria klinis pasiente',
-          onTap: () => onOpenTab(2),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        // Prescriptions always live in the patient context (Pasien -> patient
-        // -> Resep & Aimoruk), so this menu leads to the patient list.
-        AppMenuItem(
-          icon: Icons.medication_outlined,
-          title: 'Resep',
-          subtitle: 'Rese sempre mosu husi profil pasiente',
-          onTap: () => onOpenTab(1),
-        ),
-        const SizedBox(height: AppSpacing.md),
+        // Clinical visits always live in the patient context (Pasien -> pasiente
+        // -> Kunjungan Foun / Riwayat Kunjungan), so there is no visits menu.
         AppMenuItem(
           icon: Icons.sync_outlined,
           title: 'Sinkronisasi',
           subtitle: 'Haree dadus pendentes no sinkroniza',
-          onTap: () => onOpenTab(3),
-        ),
-      ],
-    );
-  }
-}
-
-/// Kunjungan tab. There is no agreed global clinical workflow yet, so this
-/// stays an explicit placeholder: visits are always opened from a patient
-/// profile (Pasien -> patient -> Kunjungan Foun / Riwayat Kunjungan).
-class _KunjunganPlaceholder extends StatelessWidget {
-  const _KunjunganPlaceholder();
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      children: [
-        Text('Kunjungan', style: AppTextStyles.appTitle),
-        const SizedBox(height: AppSpacing.md),
-        const AppCard(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Istoria klinis pasiente', style: AppTextStyles.sectionTitle),
-              SizedBox(height: AppSpacing.sm),
-              Text(
-                'Kunjungan sempre mosu husi profil pasiente. Tama iha tab '
-                '"Pasien", hili pasiente ida, depois "Kunjungan Foun" ka '
-                '"Riwayat Kunjungan".',
-                style: AppTextStyles.body,
-              ),
-            ],
-          ),
+          onTap: () => onOpenTab(2),
         ),
       ],
     );
