@@ -66,10 +66,12 @@ export class SyncRecordDto {
   @IsUUID()
   operation_id!: string;
 
-  @IsEnum(SYNC_ENTITY_TYPES)
+  // class-validator renders the allowed values from Object.keys(), which is
+  // empty for a plain array, so the message lists them explicitly.
+  @IsEnum(SYNC_ENTITY_TYPES, { message: `entity_type must be one of: ${SYNC_ENTITY_TYPES.join(', ')}` })
   entity_type!: SyncEntityType;
 
-  @IsEnum(SYNC_OPERATION_TYPES)
+  @IsEnum(SYNC_OPERATION_TYPES, { message: `operation_type must be one of: ${SYNC_OPERATION_TYPES.join(', ')}` })
   operation_type!: SyncOperationType;
 
   /** Canonical identifier the client reserved for the entity before going offline. */
